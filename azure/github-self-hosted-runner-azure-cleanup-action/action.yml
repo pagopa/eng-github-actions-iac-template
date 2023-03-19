@@ -1,0 +1,85 @@
+name: "Cleanup GitHub self hosted runner"
+description: "Cleanup a GitHub self hosted runner on Azure"
+
+inputs:
+  client_id:
+    description: "Azure service principal App Id"
+    required: true
+  tenant_id:
+    description: "Azure tenant id"
+    required: true
+  subscription_id:
+    description: "Azure subscription Id"
+    required: true
+  resource_group_name:
+    description: "Azure container app environment resource group name"
+    required: true
+  runner_name:
+    description: "GitHub runner name"
+    required: true
+  pat_token:
+    description: "GitHub PAT token to access to APIs to manage self hosted runner"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+      - name: Login
+        id: login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ inputs.client_id }}
+          tenant-id: ${{ inputs.tenant_id }}
+          subscription-id: ${{ inputs.subscription_id }}
+
+      - name: Cleanup GitHub Runner
+        shell: bash
+        id: cleanup_github_runner
+        run: |
+          AZURE_RESORCE_GROUP_NAME="${{ inputs.resource_group_name }}"
+          AZURE_CONTAINER_APP_NAME="${{ inputs.runner_name }}"
+          echo "[INFO] AZURE_CONTAINER_APP_NAME: ${AZURE_CONTAINER_APP_NAME}"
+
+          ### 1) Delete Container App
+          az config set extension.use_dynamic_install=yes_without_prompt
+
+          az containerapp delete \
+            --name "${AZURE_CONTAINER_APP_NAME}" \
+            --resource-group "${AZURE_RESORCE_GROUP_NAME}" \
+            --yes
+
+          echo "[INFO] AZURE_CONTAINER_APP_NAME deleted"
+
+          ### 2) Unregister GitHub runner
+          sleep 30
+
+          # sometimes delete operation needs more time to works,
+          # so we retry the operation for 5 minutes (300 seconds)
+
+          START_TIME=$(date +%s)
+          while [ $(( $(date +%s) - 300 )) -lt $START_TIME ]; do
+
+            GITHUB_RUNNER_ID=$(curl \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ inputs.pat_token }}" \
+              https://api.github.com/repos/${{ github.repository }}/actions/runners | jq '.runners | map(select(.name | startswith("'${AZURE_CONTAINER_APP_NAME}'"))) | .[].id' -r)
+
+            if [ -z "$GITHUB_RUNNER_ID" ]
+            then
+              echo "[INFO] GITHUB_RUNNER_ID is empty"
+              break
+            fi
+
+            echo "[INFO] GITHUB_RUNNER_ID: ${GITHUB_RUNNER_ID} is NOT empty"
+
+            curl \
+              -X DELETE \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ inputs.pat_token }}" \
+              https://api.github.com/repos/${{ github.repository }}/actions/runners/${GITHUB_RUNNER_ID}
+
+            sleep 5
+
+          done
+
+          echo "[INFO] GITHUB_RUNNER_ID deleted"
