@@ -1,0 +1,17 @@
+name: "Install terraform"
+description: "Install terraform"
+
+runs:
+  using: "composite"
+  steps:
+      - name: Setup terraform
+        id: setup-version
+        shell: bash
+        run: |
+          TERRAFORM_VERSION=`cat .terraform-version`
+          wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+          unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+          mkdir -p ${HOME}/bin
+          mv terraform ${HOME}/bin/
+          export PATH="${HOME}/bin:$PATH"
+          terraform -v
