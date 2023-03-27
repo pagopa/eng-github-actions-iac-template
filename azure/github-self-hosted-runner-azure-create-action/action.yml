@@ -66,8 +66,8 @@ runs:
 
           echo "github token value:$GITHUB_TOKEN"
 
-          if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN != "null" ]]; then
-            echo "❌ Registration runner failed: github token for registration is empty"
+          if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN == "null" ]]; then
+            echo "❌ Registration runner failed: github token for registration is empty. May be check the PAT token value"
             exit 1
           fi
 
