@@ -39,6 +39,7 @@ runs:
           AZURE_RESORCE_GROUP_NAME="${{ inputs.resource_group_name }}"
           AZURE_CONTAINER_APP_NAME="${{ inputs.runner_name }}"
           echo "[INFO] AZURE_CONTAINER_APP_NAME: ${AZURE_CONTAINER_APP_NAME}"
+          echo "✅ Variables setuped"
 
           ### 1) Delete Container App
           az config set extension.use_dynamic_install=yes_without_prompt
@@ -48,7 +49,7 @@ runs:
             --resource-group "${AZURE_RESORCE_GROUP_NAME}" \
             --yes
 
-          echo "[INFO] AZURE_CONTAINER_APP_NAME deleted"
+          echo "✅ AZURE_CONTAINER_APP deleted"
 
           ### 2) Unregister GitHub runner
           sleep 30
@@ -66,11 +67,11 @@ runs:
 
             if [ -z "$GITHUB_RUNNER_ID" ]
             then
-              echo "[INFO] GITHUB_RUNNER_ID is empty"
+              echo "[INFO] GITHUB_RUNNER_ID is empty, try again"
               break
             fi
 
-            echo "[INFO] GITHUB_RUNNER_ID: ${GITHUB_RUNNER_ID} is NOT empty"
+            echo "✅ GITHUB_RUNNER_ID: ${GITHUB_RUNNER_ID} generated correctly"
 
             curl \
               -X DELETE \
@@ -82,4 +83,4 @@ runs:
 
           done
 
-          echo "[INFO] GITHUB_RUNNER_ID deleted"
+          echo "✅ GITHUB_RUNNER_ID deleted"
