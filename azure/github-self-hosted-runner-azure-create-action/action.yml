@@ -48,12 +48,14 @@ runs:
           ### 0) Configure runner names and ids
           TIMESTAMP=$(date +%s)
           SELF_HOSTED_RUNNER_IMAGE="ghcr.io/pagopa/github-self-hosted-runner-azure:${{ inputs.self_hosted_runner_image_tag }}"
+          echo "✅ Configured runner names and ids"
 
           AZURE_RESOURCE_GROUP_NAME="${{ inputs.resource_group_name }}"
           AZURE_CONTAINER_APP_ENVIRONMENT_NAME="${{ inputs.container_app_environment_name }}"
           AZURE_CONTAINER_APP_NAME="runner-${{ github.run_id }}${TIMESTAMP}"
           echo "[INFO] AZURE_CONTAINER_APP_NAME: ${AZURE_CONTAINER_APP_NAME}"
           echo "::set-output name=AZURE_CONTAINER_APP_NAME::${AZURE_CONTAINER_APP_NAME}"
+          echo "✅ Configured azure variables"
 
           ### 1) Register runner into current GitHub Repository
           GITHUB_TOKEN=$(curl \
@@ -62,6 +64,16 @@ runs:
             -H "Authorization: Bearer ${{ inputs.pat_token }}" \
             https://api.github.com/repos/${{ github.repository }}/actions/runners/registration-token | jq ".token" -r)
 
+          echo "github token value:$GITHUB_TOKEN"
+
+          if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN == "null" ]]; then
+            echo "❌ Registration runner failed: github token for registration is empty. May be check the PAT token value"
+            exit 1
+          fi
+
+          echo "✅ Runner github correctly register"
+
+          echo "🚀 Container app creation launched"
           ### 2) Create container app linked to created runner
           az config set extension.use_dynamic_install=yes_without_prompt
 
@@ -77,3 +89,5 @@ runs:
             LABELS="${AZURE_CONTAINER_APP_NAME}" \
             GITHUB_REPOSITORY="https://github.com/${{ github.repository }}" \
             GITHUB_TOKEN=secretref:github-token
+
+          echo "✅ Container app ready to use"
