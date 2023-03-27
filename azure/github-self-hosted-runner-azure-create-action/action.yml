@@ -64,7 +64,7 @@ runs:
             -H "Authorization: Bearer ${{ inputs.pat_token }}" \
             https://api.github.com/repos/${{ github.repository }}/actions/runners/registration-token | jq ".token" -r)
 
-          if [[ -z $GITHUB_TOKEN ]]; then
+          if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN != "null" ]]; then
             echo "❌ Registration runner failed: github token for registration is empty"
             exit 1
           fi
