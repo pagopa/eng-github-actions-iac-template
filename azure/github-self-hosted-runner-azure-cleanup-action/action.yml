@@ -60,16 +60,6 @@ runs:
           START_TIME=$(date +%s)
           while [ $(( $(date +%s) - 300 )) -lt $START_TIME ]; do
 
-            GITHUB_RUNNER_ID_CHECK=$(curl \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ inputs.pat_token }}" \
-              https://api.github.com/repos/${{ github.repository }}/actions/runners | jq '.runners')
-
-            if [[ -z $GITHUB_RUNNER_ID_CHECK ]] || [[ $GITHUB_RUNNER_ID_CHECK == "null" ]]; then
-              echo "✅ No Github runners registered -> No need for others operations"
-              exit 0
-            fi
-
             GITHUB_RUNNER_ID=$(curl \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ inputs.pat_token }}" \
