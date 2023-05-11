@@ -23,7 +23,7 @@ inputs:
   self_hosted_runner_image_tag:
     description: "Self hosted runner image tag from https://github.com/pagopa/github-self-hosted-runner-azure/pkgs/container/github-self-hosted-runner-azure"
     required: true
-    default: "v1.4.0@sha256:0a0d7076b35b4d91c273202d1c59fccde9238ab447219ad327bb7589caa57cae"
+    default: "v1.4.1@sha256:97aebedab1fe4ccfca0050726f37a76d18dcfa4165493ee2f823454897548ff9"
 
 outputs:
   runner_name:
@@ -63,8 +63,6 @@ runs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ inputs.pat_token }}" \
             https://api.github.com/repos/${{ github.repository }}/actions/runners/registration-token | jq ".token" -r)
-
-          echo "github token value:$GITHUB_TOKEN"
 
           if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN == "null" ]]; then
             echo "❌ Registration runner failed: github token for registration is empty. May be check the PAT token value"
