@@ -42,4 +42,4 @@ runs:
 
           cd ${{ inputs.dir }}
 
-          bash terraform.sh plan ${{ inputs.azure_environment }} -lock-timeout=300s -lock=false
+          bash terraform.sh plan ${{ inputs.aws_environment }} -lock-timeout=300s -lock=false
