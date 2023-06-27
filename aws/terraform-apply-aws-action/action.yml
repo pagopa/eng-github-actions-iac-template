@@ -1,0 +1,38 @@
+name: "Run terraform apply"
+description: "Run terraform apply on AWS"
+
+inputs:
+  aws_iam_role:
+    description: "AWS IAM role"
+    required: true
+  aws_region:
+    description: "AWS region"
+    required: true
+  dir:
+    description: "terraform directory"
+    required: true
+  aws_environment:
+    description: "AWS Environment"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Login
+      id: login
+      # from https://github.com/aws-actions/configure-aws-credentials/tree/main
+      uses: aws-actions/configure-aws-credentials@8337ca3433e1716b025580b435b374762892752f
+      with:
+        role-to-assume: ${{ inputs.aws_iam_role }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Terraform apply
+      shell: bash
+      run: |
+        export PATH="${HOME}/bin:$PATH"
+
+        cd ${{ inputs.dir }}
+
+        terraform apply -lock-timeout=3000s -auto-approve -input=false tfplan-${{ inputs.dir }}-${{ github.sha }}
+
+        rm -rf tfplan-${{ inputs.dir }}-${{ github.sha }}
