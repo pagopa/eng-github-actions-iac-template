@@ -29,7 +29,7 @@ inputs:
 
 outputs:
   runner_name:
-    value: ${{ steps.create_github_runner.outputs.runner_name }}
+    value: ${{ steps.create_github_runner.outputs.RUNNER_NAME }}
     description: 'Name of the self-hosted runner'
 
 runs:
@@ -109,3 +109,5 @@ runs:
           -H "Authorization: Bearer ${{ inputs.pat_token }}" \
           https://api.github.com/repos/${{ github.repository }}/actions/runners/${GITHUB_RUNNER_ID}/labels \
           -d '{"labels":["run_id:${{ github.run_id }}", "matrix_index:${{matrix.index}}", "task_id:'${ECS_TASK_ID}'"]}'
+
+        echo "RUNNER_NAME=${RUNNER_NAME}" >> $GITHUB_OUTPUT
