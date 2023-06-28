@@ -26,4 +26,7 @@ runs:
     - name: AWS Update Kube Config
       shell: bash
       run: |
-        aws eks update-kubeconfig --name ${{ inputs.eks_cluster_name }}
+        aws eks update-kubeconfig \
+          --region ${{ inputs.aws_region }} \
+          --name ${{ inputs.eks_cluster_name }} \
+          --kubeconfig $HOME/.kube/config
