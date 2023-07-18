@@ -11,8 +11,14 @@ inputs:
   ecs_cluster_name:
     description: "ECS cluster"
     required: true
+  ecs_task_id:
+    description: "Id of the ECS task that exec the runner"
+    required: true
   pat_token:
     description: "GitHub PAT token to access APIs to manage self hosted runner"
+    required: true
+  runner_name:
+    description: "Name of the runner to cleanup"
     required: true
 
 runs:
@@ -30,24 +36,18 @@ runs:
       run: |
         set -eo pipefail
 
-        RUNNER_NAME="${{ github.run_id }}-${{ matrix.index }}"
+        GITHUB_REPOSITORY="https://github.com/${{ github.repository }}"
+        echo "[INFO] Configured variables"
 
         GITHUB_RUNNER_ID=$(curl -s \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ inputs.pat_token }}" \
           https://api.github.com/repos/${{ github.repository }}/actions/runners \
-          | jq '.runners | map(select(.name == "'${RUNNER_NAME}'")) | .[].id' -r)
-
-        ECS_TASK_ID=$(curl -s \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ inputs.pat_token }}" \
-          https://api.github.com/repos/${{ github.repository }}/actions/runners/${GITHUB_RUNNER_ID} \
-          | jq -r '.labels[] | select(.name | startswith("task_id:")) | .name' \
-          | cut -d: -f2)
+          | jq '.runners | map(select(.name == "'${{ inputs.runner_name }}'")) | .[].id' -r)
 
         aws ecs stop-task \
           --cluster ${{ inputs.ecs_cluster_name }} \
-          --task ${ECS_TASK_ID} > /dev/null
+          --task ${{ inputs.ecs_task_id }} > /dev/null
 
         echo "[INFO] ECS task ${ECS_TASK_ID} stopped"
 
@@ -66,10 +66,10 @@ runs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ inputs.pat_token }}" \
             https://api.github.com/repos/${{ github.repository }}/actions/runners \
-            | jq '.runners | map(select(.name == "'${RUNNER_NAME}'")) | .[].id' -r)
+            | jq '.runners | map(select(.name == "'${{ inputs.runner_name }}'")) | .[].id' -r)
 
           if [ -z "$GITHUB_RUNNER_ID" ]; then
-            echo "[INFO] Runner ${RUNNER_NAME} has been deleted"
+            echo "[INFO] Runner ${{ inputs.runner_name }} has been deleted"
             break
           fi
 
@@ -78,6 +78,6 @@ runs:
         done
 
         if [ -n "$GITHUB_RUNNER_ID" ]; then
-          echo "[ERROR] Runner ${RUNNER_NAME} was not deleted from Github" >&2
+          echo "[ERROR] Runner ${{ inputs.runner_name }} was not deleted from Github" >&2
           exit 1
         fi
