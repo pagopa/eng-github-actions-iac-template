@@ -23,7 +23,7 @@ inputs:
   self_hosted_runner_image_tag:
     description: "Self hosted runner image tag from https://github.com/pagopa/github-self-hosted-runner-azure/pkgs/container/github-self-hosted-runner-azure"
     required: true
-    default: "v1.5.0@sha256:fbb33576e443f7fd04b70aa66f30cc506c4d3854277d6bd18825366f857e72b2"
+    default: "v1.6.1@sha256:3ed806535a5a50104f2a74d0e1da860a8953049ec6eca26af71f5920de4838dd"
 
 outputs:
   runner_name:
