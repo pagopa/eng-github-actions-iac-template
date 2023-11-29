@@ -23,69 +23,69 @@ inputs:
   self_hosted_runner_image_tag:
     description: "Self hosted runner image tag from https://github.com/pagopa/github-self-hosted-runner-azure/pkgs/container/github-self-hosted-runner-azure"
     required: true
-    default: "v1.6.1@sha256:3ed806535a5a50104f2a74d0e1da860a8953049ec6eca26af71f5920de4838dd"
+    default: "v1.6.2@sha256:59b94c76a4a79b384cead305993569826b2247ef97e49d772f1e41cd967fa5ae"
 
 outputs:
   runner_name:
     value: ${{ steps.create_github_runner.outputs.AZURE_CONTAINER_APP_NAME }}
-    description: 'Azure Container App Name'
+    description: "Azure Container App Name"
 
 runs:
   using: "composite"
   steps:
-      - name: Login
-        id: login
-        uses: azure/login@v1
-        with:
-          client-id: ${{ inputs.client_id }}
-          tenant-id: ${{ inputs.tenant_id }}
-          subscription-id: ${{ inputs.subscription_id }}
+    - name: Login
+      id: login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ inputs.client_id }}
+        tenant-id: ${{ inputs.tenant_id }}
+        subscription-id: ${{ inputs.subscription_id }}
 
-      - name: Create GitHub Runner
-        id: create_github_runner
-        shell: bash
-        run: |
-          ### 0) Configure runner names and ids
-          TIMESTAMP=$(date +%s)
-          SELF_HOSTED_RUNNER_IMAGE="ghcr.io/pagopa/github-self-hosted-runner-azure:${{ inputs.self_hosted_runner_image_tag }}"
-          echo "✅ Configured runner names and ids"
+    - name: Create GitHub Runner
+      id: create_github_runner
+      shell: bash
+      run: |
+        ### 0) Configure runner names and ids
+        TIMESTAMP=$(date +%s)
+        SELF_HOSTED_RUNNER_IMAGE="ghcr.io/pagopa/github-self-hosted-runner-azure:${{ inputs.self_hosted_runner_image_tag }}"
+        echo "✅ Configured runner names and ids"
 
-          AZURE_RESOURCE_GROUP_NAME="${{ inputs.resource_group_name }}"
-          AZURE_CONTAINER_APP_ENVIRONMENT_NAME="${{ inputs.container_app_environment_name }}"
-          AZURE_CONTAINER_APP_NAME="runner-${{ github.run_id }}${TIMESTAMP}"
-          echo "[INFO] AZURE_CONTAINER_APP_NAME: ${AZURE_CONTAINER_APP_NAME}"
-          echo "::set-output name=AZURE_CONTAINER_APP_NAME::${AZURE_CONTAINER_APP_NAME}"
-          echo "✅ Configured azure variables"
+        AZURE_RESOURCE_GROUP_NAME="${{ inputs.resource_group_name }}"
+        AZURE_CONTAINER_APP_ENVIRONMENT_NAME="${{ inputs.container_app_environment_name }}"
+        AZURE_CONTAINER_APP_NAME="runner-${{ github.run_id }}${TIMESTAMP}"
+        echo "[INFO] AZURE_CONTAINER_APP_NAME: ${AZURE_CONTAINER_APP_NAME}"
+        echo "::set-output name=AZURE_CONTAINER_APP_NAME::${AZURE_CONTAINER_APP_NAME}"
+        echo "✅ Configured azure variables"
 
-          ### 1) Register runner into current GitHub Repository
-          GITHUB_TOKEN=$(curl \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ inputs.pat_token }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/runners/registration-token | jq ".token" -r)
+        ### 1) Register runner into current GitHub Repository
+        GITHUB_TOKEN=$(curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ inputs.pat_token }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/runners/registration-token | jq ".token" -r)
 
-          if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN == "null" ]]; then
-            echo "❌ Registration runner failed: github token for registration is empty. May be check the PAT token value"
-            exit 1
-          fi
+        if [[ -z $GITHUB_TOKEN ]] || [[ $GITHUB_TOKEN == "null" ]]; then
+          echo "❌ Registration runner failed: github token for registration is empty. May be check the PAT token value"
+          exit 1
+        fi
 
-          echo "✅ Runner github correctly register"
+        echo "✅ Runner github correctly register"
 
-          echo "🚀 Container app creation launched"
-          ### 2) Create container app linked to created runner
-          az config set extension.use_dynamic_install=yes_without_prompt
+        echo "🚀 Container app creation launched"
+        ### 2) Create container app linked to created runner
+        az config set extension.use_dynamic_install=yes_without_prompt
 
-          az containerapp create \
-            --name "${AZURE_CONTAINER_APP_NAME}" \
-            --resource-group "${AZURE_RESOURCE_GROUP_NAME}" \
-            --image "${SELF_HOSTED_RUNNER_IMAGE}" \
-            --min-replicas 1 \
-            --max-replicas 1 \
-            --environment "${AZURE_CONTAINER_APP_ENVIRONMENT_NAME}" \
-            --secrets github-token="${GITHUB_TOKEN}" \
-            --env-vars \
-            LABELS="${AZURE_CONTAINER_APP_NAME}" \
-            GITHUB_REPOSITORY="https://github.com/${{ github.repository }}" \
-            GITHUB_TOKEN=secretref:github-token
+        az containerapp create \
+          --name "${AZURE_CONTAINER_APP_NAME}" \
+          --resource-group "${AZURE_RESOURCE_GROUP_NAME}" \
+          --image "${SELF_HOSTED_RUNNER_IMAGE}" \
+          --min-replicas 1 \
+          --max-replicas 1 \
+          --environment "${AZURE_CONTAINER_APP_ENVIRONMENT_NAME}" \
+          --secrets github-token="${GITHUB_TOKEN}" \
+          --env-vars \
+          LABELS="${AZURE_CONTAINER_APP_NAME}" \
+          GITHUB_REPOSITORY="https://github.com/${{ github.repository }}" \
+          GITHUB_TOKEN=secretref:github-token
 
-          echo "✅ Container app ready to use"
+        echo "✅ Container app ready to use"
