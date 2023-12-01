@@ -23,8 +23,6 @@ jobs:
     name: Create Self-Hosted Runner
     runs-on: ubuntu-22.04
     strategy:
-      matrix:
-        index: [1]
       fail-fast: true
     environment: ${{ inputs.environment }}
     outputs:
@@ -33,7 +31,7 @@ jobs:
     steps:
       - name: Start GitHub Runner
         id: start_runner
-        uses: pagopa/eng-github-actions-iac-template/create-github-runner-aws-action@v1
+        uses: pagopa/eng-github-actions-iac-template/aws/create-github-runner-aws-action@v1.6.0
         with:
           aws_region: ${{ vars.AWS_REGION }}
           iam_role_arn: ${{ vars.IAM_ROLE }}

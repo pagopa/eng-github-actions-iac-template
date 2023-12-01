@@ -25,8 +25,6 @@ jobs:
     name: Create Self-Hosted Runner
     runs-on: ubuntu-22.04
     strategy:
-      matrix:
-        index: [1]
       fail-fast: true
     outputs:
       runner_name: ${{ steps.start_runner.outputs.runner_name }}
@@ -34,7 +32,7 @@ jobs:
     steps:
       - name: Start GitHub Runner
         id: start_runner
-        uses: pagopa/eng-github-actions-iac-template/create-github-runner-aws-action@v1
+        uses: pagopa/eng-github-actions-iac-template/aws/create-github-runner-aws-action@v1.6.0
         with:
           aws_region: ${{ vars.AWS_REGION }}
           iam_role_arn: ${{ vars.IAM_ROLE }}
@@ -59,8 +57,6 @@ jobs:
     name: Delete Self-Hosted Runner
     needs: [create_runner, list_s3_buckets]
     strategy:
-      matrix:
-        index: [1]
       fail-fast: true
     if: ${{ always() }}
     runs-on: ubuntu-22.04
@@ -68,7 +64,7 @@ jobs:
     steps:
       - name: Remove Github Runner
         id: remove_runner
-        uses: pagopa/eng-github-actions-iac-template/remove-github-runner-aws-action@v1
+        uses: pagopa/eng-github-actions-iac-template/aws/remove-github-runner-aws-action@v1.6.0
         with:
           aws_region: ${{ vars.AWS_REGION }}
           iam_role_arn: ${{ vars.IAM_ROLE }}
