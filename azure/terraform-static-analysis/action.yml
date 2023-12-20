@@ -52,6 +52,16 @@ runs:
           wait "$pid"
         done
 
+    - name: Show precommit version
+      shell: bash
+      run: |
+        echo -e "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+        echo    "+ 1️⃣  SHOW PRECOMMIT VERION 1️⃣  +"
+        echo -e "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
+
+        TAG=${{ inputs.precommit_version }}
+        docker run --rm --entrypoint cat ghcr.io/antonbabenko/pre-commit-terraform:$TAG /usr/bin/tools_versions_info
+
     - name: 🚨 Run precommit
       id: run_precommit
       shell: bash
@@ -60,5 +70,5 @@ runs:
         echo    "+- 🚨 PRECOMMIT TERRAFORM 🚨 -+"
         echo -e "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n"
 
-        TAG=v${{ inputs.precommit_version }}
+        TAG=${{ inputs.precommit_version }}
         docker run -v $(pwd):/lint -w /lint ghcr.io/antonbabenko/pre-commit-terraform:$TAG run -a
