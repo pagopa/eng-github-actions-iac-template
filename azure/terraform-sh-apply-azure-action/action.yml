@@ -56,5 +56,5 @@ runs:
                -auto-approve \
                -input=false \
                -lock-timeout=${{ inputs.tf_lock_timeout }} \
-               ${{ tf_others_params }}
+               ${{ inputs.tf_others_params }}
 
