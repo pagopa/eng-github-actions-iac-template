@@ -1,0 +1,68 @@
+name: "Run terraform.sh apply"
+description: "Run terraform apply on Azure"
+
+inputs:
+  client_id:
+    description: "Azure user-assigned managed identity client ID(App)"
+    required: true
+  tenant_id:
+    description: "Azure tenant id"
+    required: true
+  subscription_id:
+    description: "Azure subscription Id"
+    required: true
+  dir:
+    description: "Terraform project directory"
+    required: true
+  tf_environment:
+    description: "Terraform Environment"
+    required: true
+  tf_lock_timeout:
+    description: "(Optional) How much time manteins the lock, default 3000s"
+    default: "3000s"
+    required: false
+  tf_others_params:
+    description: "(Optional) Additional params for terraform.sh apply"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+      - name: Azure Login
+        id: login
+        # from https://github.com/Azure/login/commits/master
+        uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 #v2.1.0
+        with:
+          client-id: ${{ inputs.client_id }}
+          tenant-id: ${{ inputs.tenant_id }}
+          subscription-id: ${{ inputs.subscription_id }}
+
+      - name: Terraform apply
+        shell: bash
+        run: |
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" ]; then
+            echo "❌ the variable ACTIONS_ID_TOKEN_REQUEST_TOKEN is empty and is mandatory for terraform."
+            exit 1
+          fi
+
+          export PATH="${HOME}/bin:$PATH"
+
+          cd "${{ inputs.dir }}"  || { echo "❌ folder doesn't exists"; exit 1; }
+
+          echo "✅ Current folder is: ${{ inputs.dir }}"
+
+          export ARM_OIDC_REQUEST_TOKEN=${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }} #this token is created by azure login and mandatory for tf
+          export ARM_USE_OIDC=true
+          export ARM_CLIENT_ID=${{ inputs.client_id }}
+          export ARM_SUBSCRIPTION_ID=${{ inputs.subscription_id }}
+          export ARM_TENANT_ID=${{ inputs.tenant_id }}
+
+          echo "✅ ENV variables setup complete"
+
+          bash ./terraform.sh apply ${{ inputs.tf_environment }} \
+               -auto-approve \
+               -input=false \
+               -lock-timeout=${{ inputs.tf_lock_timeout }} \
+               ${{ inputs.tf_others_params }}
+
+          echo "🚀 Terraform apply complete"
