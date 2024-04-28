@@ -48,7 +48,7 @@ runs:
 
           printenv
 
-          #export ARM_OIDC_TOKEN=${{ env.ACTIONS_RUNTIME_TOKEN }} #this token is created by azure login
+          export ARM_OIDC_REQUEST_TOKEN=${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }} #this token is created by azure login
           export ARM_USE_OIDC=true
           export ARM_CLIENT_ID=${{ inputs.client_id }}
           export ARM_SUBSCRIPTION_ID=${{ inputs.subscription_id }}
