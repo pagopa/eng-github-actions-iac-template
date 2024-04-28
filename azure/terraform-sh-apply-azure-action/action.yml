@@ -41,8 +41,6 @@ runs:
         shell: bash
         run: |
           export PATH="${HOME}/bin:$PATH"
-#          export ARM_USE_AZUREAD=true
-#          export ARM_STORAGE_USE_AZUREAD=true
 
           cd "${{ inputs.dir }}"  || { echo "❌ folder doesn't exists"; exit 1; }
 
