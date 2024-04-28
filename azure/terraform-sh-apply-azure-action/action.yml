@@ -3,7 +3,7 @@ description: "Run terraform apply on Azure"
 
 inputs:
   client_id:
-    description: "Azure service principal Id(App)"
+    description: "Azure user-assigned managed identity client ID(App)"
     required: true
   tenant_id:
     description: "Azure tenant id"
@@ -40,15 +40,18 @@ runs:
       - name: Terraform apply
         shell: bash
         run: |
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" ]; then
+            echo "❌ the variable ACTIONS_ID_TOKEN_REQUEST_TOKEN is empty and is mandatory for terraform."
+            exit 1
+          fi
+
           export PATH="${HOME}/bin:$PATH"
 
           cd "${{ inputs.dir }}"  || { echo "❌ folder doesn't exists"; exit 1; }
 
           echo "✅ Current folder is: ${{ inputs.dir }}"
 
-          printenv
-
-          export ARM_OIDC_REQUEST_TOKEN=${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }} #this token is created by azure login
+          export ARM_OIDC_REQUEST_TOKEN=${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }} #this token is created by azure login and mandatory for tf
           export ARM_USE_OIDC=true
           export ARM_CLIENT_ID=${{ inputs.client_id }}
           export ARM_SUBSCRIPTION_ID=${{ inputs.subscription_id }}
