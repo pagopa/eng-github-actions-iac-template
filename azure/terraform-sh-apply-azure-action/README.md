@@ -1,0 +1,37 @@
+# terraform-sh-apply-azure-action
+
+## How to use
+
+```yaml
+  update_openapi:
+    runs-on: ubuntu-22.04
+    name: Update OpenAPI
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        id: checkout
+        # from https://github.com/actions/checkout/commits/main
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b #v4.1.4
+        with:
+          persist-credentials: false
+
+      - name: Read current terraform version
+        run: |
+          VER=$(cat .terraform-version)
+          echo "TERRAFORM_VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        # from https://github.com/hashicorp/setup-terraform/commits/main
+        uses: hashicorp/setup-terraform@97f030cf6dc0b4f5e0da352c7bca9cca34579800 #v3.1.0
+        with:
+          terraform_version: "${{ env.TERRAFORM_VERSION }}"
+
+      - name: Apply terraform.sh
+        uses: pagopa/eng-github-actions-iac-template/azure/terraform-sh-apply-azure-action@added-terraform-sh-apply-azure
+        with:
+          client_id: "${{ secrets.CD_CLIENT_ID }}"
+          tenant_id: "${{ secrets.TENANT_ID }}"
+          subscription_id: "${{ secrets.SUBSCRIPTION_ID }}"
+          tf_environment: "weu-${{ inputs.environment }}"
+          dir: "infra"
+```
