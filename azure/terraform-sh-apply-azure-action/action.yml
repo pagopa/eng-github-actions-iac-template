@@ -23,7 +23,7 @@ inputs:
     required: false
   tf_others_params:
     description: "Additional params for terraform.sh apply"
-    required: true
+    required: false
 
 runs:
   using: "composite"
