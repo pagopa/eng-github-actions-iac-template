@@ -49,7 +49,7 @@ runs:
 
           cd "${{ inputs.dir }}"  || { echo "❌ folder doesn't exists"; exit 1; }
 
-          echo "✅ Current folder is: ${{ inputs.dir }}"
+          echo "✅ Current folder is:: ${{ inputs.dir }}"
 
           export ARM_OIDC_REQUEST_TOKEN=${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }} #this token is created by azure login and mandatory for tf
           export ARM_USE_OIDC=true
