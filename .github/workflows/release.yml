@@ -16,6 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release action
-        uses: ./global/release-action # same repo
+        uses: ../global/release-action # same repo
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
