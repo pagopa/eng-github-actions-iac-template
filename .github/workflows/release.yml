@@ -13,25 +13,9 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        id: checkout
-        # from https://github.com/actions/checkout/commits/main
-        uses: actions/checkout@1f9a0c22da41e6ebfa534300ef656657ea2c6707
+      - name: Release action
+        uses: ./global/release-action # same repo
         with:
-          persist-credentials: false
-          fetch-depth: 0
-
-      - name: Release
-        id: release
-        # from https://github.com/cycjimmy/semantic-release-action/commits/main
-        uses: cycjimmy/semantic-release-action@bdd914ff2423e2792c73475f11e8da603182f32d
-        with:
-          semantic_version: 18.0.0
-          extra_plugins: |
-            @semantic-release/release-notes-generator@10.0.3
-            @semantic-release/git@10.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
