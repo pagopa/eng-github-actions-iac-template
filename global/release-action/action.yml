@@ -32,12 +32,15 @@ runs:
   using: "composite"
   steps:
       - name: Checkout
+        # from https://github.com/actions/checkout/commits/main
+
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b #v4.1.4
         with:
           persist-credentials: false
           fetch-depth: 0
 
       - name: Release
+        # from https://github.com/cycjimmy/semantic-release-action/commits/main
         uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
         with:
           semantic_version: ${{ inputs.semantic_version }}
