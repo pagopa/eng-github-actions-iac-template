@@ -5,7 +5,7 @@ inputs:
   precommit_version:
     required: false
     description: Version of pre-commit-terraform release
-    default: 'v1.83.5@sha256:fed35dd9347aa3dd3e59a870dbc4500245dae26910d84065a6f66fe61afceaa8'
+    default: 'v1.89.1@sha256:c9646748faf2914cbac342e9c06a7b5865d06d2f'
 
 runs:
   using: "composite"
