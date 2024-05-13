@@ -28,7 +28,7 @@ runs:
 
         echo "📢 Show space"
         df -h
-        du -h $HOME/.terraform.d/plugin-cache
+        du -h ${TF_PLUGIN_CACHE_DIR}
 
         echo -e "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
         echo    "+ 🏁 INIT TERRAFORM FOLDERS 🏁   +"
@@ -67,7 +67,7 @@ runs:
 
         echo "📢 Show space"
         df -h
-        du -h $HOME/.terraform.d/plugin-cache
+        du -h ${TF_PLUGIN_CACHE_DIR}
 
     - name: Show precommit version
       shell: bash
