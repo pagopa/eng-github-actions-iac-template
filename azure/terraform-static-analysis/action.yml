@@ -16,6 +16,8 @@ runs:
     - name: 🏁 Init terraform folders
       id: init_terraform_folders
       shell: bash
+      env:
+        TF_PLUGIN_CACHE_DIR: "$HOME/.terraform.d/plugin-cache"
       run: |
         echo -e "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
         echo    "+ 🏁 INIT TERRAFORM FOLDERS 🏁 +"
@@ -51,6 +53,10 @@ runs:
           #
           wait "$pid"
         done
+
+        echo "📢 Show space"
+        df -h
+        du -h $HOME/.terraform.d/plugin-cache
 
     - name: Show precommit version
       shell: bash
