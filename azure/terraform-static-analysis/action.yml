@@ -13,26 +13,25 @@ runs:
     - name: ⚡ Checkout code
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-    - name: 🔨 Create basic folders
-      id: init_terraform_cache_folder
-      shell: bash
-      env:
-        TF_PLUGIN_CACHE_DIR: "$HOME/.terraform.d/plugin-cache"
-      run:
-        mkdir -p ${TF_PLUGIN_CACHE_DIR}
-
-        echo "📢 Show space"
-        df -h
-        du -h $HOME/.terraform.d/plugin-cache
-
     - name: 🏁 Init terraform folders
       id: init_terraform_folders
       shell: bash
       env:
         TF_PLUGIN_CACHE_DIR: "$HOME/.terraform.d/plugin-cache"
       run: |
+
         echo -e "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
-        echo    "+ 🏁 INIT TERRAFORM FOLDERS 🏁 +"
+        echo    "+ 🔨 CREATE CACHE FOLDER         +"
+        echo -e "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n"
+
+        mkdir -p ${TF_PLUGIN_CACHE_DIR}
+
+        echo "📢 Show space"
+        df -h
+        du -h $HOME/.terraform.d/plugin-cache
+
+        echo -e "\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+        echo    "+ 🏁 INIT TERRAFORM FOLDERS 🏁   +"
         echo -e "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n"
 
         FOLDERS=$(grep -rl --include='*.tf' --exclude-dir='.terraform' '^' . | xargs -I{} dirname {} | sort -u)
