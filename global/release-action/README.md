@@ -1,8 +1,14 @@
 # Release action
 
 This action allows to generate a release + tags in github
+and use `https://github.com/cycjimmy/semantic-release-action/commits/main` action
 
 ## How to use
+
+### Pre requisites
+
+Copy the file `.releaserc.json` into the project root folder to configure the plugins
+used by `cycjimmy/semantic-release-action`
 
 ### Action
 
@@ -28,10 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Release action
-        uses: pagopa/eng-github-actions-iac-template/global/release-action@release-action # 
+        id: release
+        uses: pagopa/eng-github-actions-iac-template/global/release-action@main # 
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
-
-and copy the file `.releaserc.json` into the project root folder to configure the plugins
-to use the release action pipeline
