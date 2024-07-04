@@ -1,6 +1,38 @@
 name: "Release action"
 description: "Run release action: create tag and release"
 
+outputs:
+  new_release_published:
+    description: 'Whether a new release was published'
+    value: ${{ steps._release.outputs.new_release_published }}
+  new_release_version:
+    description: 'Version of the new release'
+    value: ${{ steps._release.outputs.new_release_version }}
+  new_release_major_version:
+    description: 'Major version of the new release'
+    value: ${{ steps._release.outputs.new_release_major_version }}
+  new_release_minor_version:
+    description: 'Minor version of the new release'
+    value: ${{ steps._release.outputs.new_release_minor_version }}
+  new_release_patch_version:
+    description: 'Patch version of the new release'
+    value: ${{ steps._release.outputs.new_release_patch_version }}
+  new_release_git_head:
+    description: 'The sha of the last commit being part of the new release.'
+    value: ${{ steps._release.outputs.new_release_git_head }}
+  new_release_git_tag:
+    description: 'The Git tag associated with the new release.'
+    value: ${{ steps._release.outputs.new_release_git_tag }}
+  last_release_version:
+    description: 'Version of the previous release, if there was one.'
+    value: ${{ steps._release.outputs.last_release_version }}
+  last_release_git_head:
+    description: 'The sha of the last commit being part of the last release, if there was one.'
+    value: ${{ steps._release.outputs.last_release_git_head }}
+  last_release_git_tag:
+    description: 'The Git tag associated with the last release, if there was one.'
+    value: ${{ steps._release.outputs.last_release_git_tag }}
+
 inputs:
   github_token:
     description: "Github token used by the action"
@@ -33,13 +65,13 @@ runs:
   steps:
       - name: Checkout
         # from https://github.com/actions/checkout/commits/main
-
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b #v4.1.4
         with:
           persist-credentials: false
           fetch-depth: 0
 
       - name: Release
+        id: _release
         # from https://github.com/cycjimmy/semantic-release-action/commits/main
         uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
         with:
