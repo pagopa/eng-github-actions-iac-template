@@ -5,6 +5,10 @@ inputs:
   github_token:
     description: "Github token used by the action"
     required: true
+  docker_context_path:
+    description: "Dockerfile context path"
+    required: false
+    default: "."
 
 runs:
   using: "composite"
@@ -31,7 +35,7 @@ runs:
         # from https://github.com/docker/build-push-action/commits/master
         uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c #v6.3.0
         with:
-          context: .
+          context: ${{ inputs.docker_context_path }}
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
