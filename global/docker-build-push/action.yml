@@ -35,7 +35,6 @@ runs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            #e.g. snapshot-my-branch
             ghcr.io/${{ github.repository }}:${{ inputs.docker_tag_prefix }}-${{ github.ref_name }}
           labels: |
             maintainer=https://pagopa.it
