@@ -1,27 +1,31 @@
-name: "Release and docker build & push action"
-description: "Release and build/push docker image into github package repository"
+name: "Docker build and push"
+description: "Build/push docker image into github package repository"
 
 inputs:
   github_token:
     description: "Github token used by the action"
     required: true
   docker_context_path:
-    description: "Dockerfile context path"
+    description: "Docker context folder"
     required: false
     default: "."
+  docker_tag_prefix:
+    description: "Docker context folder"
+    required: false
+    default: "snapshot"
 
 runs:
   using: "composite"
   steps:
-      - name: Release and tag action
-        id: release
-        uses: pagopa/eng-github-actions-iac-template/global/release-action@main #
+      - name: ⏬ Checkout
+        # from https://github.com/actions/checkout/commits/main
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b #v4.1.4
         with:
-          github_token: ${{ inputs.github_token }}
+          persist-credentials: false
+          fetch-depth: 0
 
-      - name: Log in to the Github Container registry
+      - name: 🏷️ Log in to the Github Container registry
         id: docker_login
-        if: steps.release.outputs.new_release_published == 'true'
         # from https://github.com/docker/login-action/commits/master
         uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 #v3.2.0
         with:
@@ -29,9 +33,8 @@ runs:
           username: ${{ github.actor }}
           password: ${{ inputs.github_token }}
 
-      - name: Build and push Docker image with release version
+      - name: 🚀 Build and push Docker image with release version
         id: docker_build_push
-        if: steps.release.outputs.new_release_published == 'true'
         # from https://github.com/docker/build-push-action/commits/master
         uses: docker/build-push-action@1a162644f9a7e87d8f4b053101d1d9a712edc18c #v6.3.0
         with:
@@ -39,7 +42,7 @@ runs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:v${{ steps.release.outputs.new_release_version }}
+            ghcr.io/${{ github.repository }}:${{ inputs.docker_tag_prefix }}-${{ github.ref_name }}
           labels: |
             maintainer=https://pagopa.it
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
