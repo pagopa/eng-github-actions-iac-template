@@ -59,6 +59,9 @@ inputs:
     default: |
       @semantic-release/release-notes-generator@13.0.0
       @semantic-release/git@10.0.1
+  tag_format:
+    description: "Specify format of tag. Default is v{version}"
+    default: "v{version}"
 
 runs:
   using: "composite"
@@ -73,11 +76,12 @@ runs:
       - name: Release
         id: _release
         # from https://github.com/cycjimmy/semantic-release-action/commits/main
-        uses: cycjimmy/semantic-release-action@cb425203a562475bca039ba4dbf90c7f9ac790f4 #v4.1.0
+        uses: cycjimmy/semantic-release-action@b1b432f13acb7768e0c8efdec416d363a57546f2 #v4.1.1
         with:
           semantic_version: ${{ inputs.semantic_version }}
           ci: ${{ inputs.ci }}
           branches: ${{ inputs.branches }}
           extra_plugins: ${{ inputs.extra_plugins }}
+          tag_format: ${{ inputs.tag_format }}
         env:
           GITHUB_TOKEN: ${{ inputs.github_token }}
