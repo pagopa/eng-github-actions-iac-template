@@ -40,7 +40,7 @@ inputs:
   semantic_version:
     description: "(Optional) Specify version range for semantic-release."
     required: false
-    default: 21.1.1
+    default: 23.1.1
   ci:
     description: "(Optional) Whether to run semantic release with CI support."
     required: false
@@ -58,10 +58,10 @@ inputs:
     required: false
     default: |
       @semantic-release/release-notes-generator@13.0.0
-      @semantic-release/git@10.0.1
+      @semantic-release/github@23.1.1
   tag_format:
-    description: "Specify format of tag. Default is v{version}"
-    default: "v{version}"
+    description: "Specify format of tag. Default is v${version}"
+    default: "v${version}"
 
 runs:
   using: "composite"
