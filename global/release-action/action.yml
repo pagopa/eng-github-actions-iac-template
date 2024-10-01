@@ -58,7 +58,7 @@ inputs:
     required: false
     default: |
       @semantic-release/release-notes-generator@13.0.0
-      @semantic-release/github@23.1.1
+      @semantic-release/github@v10.3.5
   tag_format:
     description: "Specify format of tag. Default is v${version}"
     default: "v${version}"
