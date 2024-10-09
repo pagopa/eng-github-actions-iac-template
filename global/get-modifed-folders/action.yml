@@ -178,30 +178,31 @@ runs:
         if __name__ == "__main__":
           main()
 
-        - name: Read modified paths
-          if: env.run_static_analysis == 'true'
-          id: read_paths
-          run: |
-            modified_paths=$(cat /tmp/paths.txt)
-            echo "Modified paths: $modified_paths"
-            echo "::set-output name=modified_paths::$modified_paths"
+    - name: Read modified paths
+      if: env.run_static_analysis == 'true'
+      shell: bash
+      id: read_paths
+      run: |
+        modified_paths=$(cat /tmp/paths.txt)
+        echo "Modified paths: $modified_paths"
+        echo "::set-output name=modified_paths::$modified_paths"
 
-        - name: ⏬ Download Modified Folders Only
-          if: env.run_static_analysis == 'true'
-          id: download_changed_folders
-          shell: bash
-          run: |
-            # Read all paths and download only the modified folders
-            MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
+    - name: ⏬ Download Modified Folders Only
+      if: env.run_static_analysis == 'true'
+      id: download_changed_folders
+      shell: bash
+      run: |
+        # Read all paths and download only the modified folders
+        MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
 
-            # Include 'scripts' in the list of directories to checkout
-            MODIFIED_FOLDERS+=("scripts")
+        # Include 'scripts' in the list of directories to checkout
+        MODIFIED_FOLDERS+=("scripts")
 
-            # Initialize git sparse-checkout
-            git sparse-checkout init --cone
+        # Initialize git sparse-checkout
+        git sparse-checkout init --cone
 
-            # Set each path in MODIFIED_FOLDERS for sparse-checkout
-            git sparse-checkout set "${MODIFIED_FOLDERS[@]}"
+        # Set each path in MODIFIED_FOLDERS for sparse-checkout
+        git sparse-checkout set "${MODIFIED_FOLDERS[@]}"
 
-            # Checkout the latest changes
-            git checkout
+        # Checkout the latest changes
+        git checkout
