@@ -65,7 +65,7 @@ runs:
           ".utils"
         ]
 
-        STARTING_INDEX = ${{ inputs.starting_index }}
+        STARTING_INDEX = "${{ inputs.starting_index }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_index }}
         INCLUDE_PATTERNS = ${{ inputs.include_patterns }}
         EXCLUDE_IGNORED = ${{ inputs.exclude_ignored }}
