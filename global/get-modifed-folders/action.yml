@@ -13,9 +13,7 @@ inputs:
     required: true
   include_patterns:
     description: 'Patterns to include in path filtering'
-    default: |
-      - src
-      - domains
+    default: 'src,domains'
     required: true
   exclude_ignored:
     description: 'Whether to exclude ignored paths'
