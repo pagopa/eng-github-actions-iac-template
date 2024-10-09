@@ -53,6 +53,7 @@ runs:
       id: get-paths
       shell: bash
       run: |
+        python - <<'EOF'
         import os
         import subprocess
         from typing import List
@@ -181,6 +182,7 @@ runs:
 
         if __name__ == "__main__":
           main()
+        EOF
 
     - name: Read modified paths
       if: env.run_static_analysis == 'true'
