@@ -1,0 +1,207 @@
+name: "📁 Get modified directory and sparse checkout"
+description: "Retrieve all modified directory and perform a sparse checkout."
+
+
+inputs:
+  starting_index:
+    description: 'Starting index for path filtering'
+    default: '/'
+    required: true
+  default_end_index:
+    description: 'Default end index for path slicing'
+    default: 2
+    required: true
+  include_patterns:
+    description: 'Patterns to include in path filtering'
+    default: |
+      - src
+      - domains
+    required: true
+  exclude_ignored:
+    description: 'Whether to exclude ignored paths'
+    default: true
+    required: true
+
+
+outputs:
+  modified_paths:
+    description: "List of modified paths"
+    value: ${{ steps.get-paths.outputs.modified_paths }}
+  run_static_analysis:
+    description: "Determines if static analysis should run"
+    value: ${{ env.run_static_analysis }}
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: ⏬ Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: 🔨 Get Modified Paths
+      id: get-paths
+      shell: bash
+      run: |
+        import os
+        import subprocess
+        from typing import List
+
+        DEFAULT_IGNORED_PATHS = [
+          ".github",
+          ".devops"
+          ".vscode",
+          ".utils"
+        ]
+
+        STARTING_INDEX = ${{ inputs.starting_index }}
+        DEFAULT_END_INDEX = ${{ inputs.default_end_index }}
+        INCLUDE_PATTERNS = ${{ inputs.include_patterns }}
+        EXCLUDE_IGNORED = ${{ inputs.exclude_ignored }}
+
+
+        def get_current_branch():
+          result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                                  capture_output=True, text=True)
+          return result.stdout.strip()
+
+
+        def get_git_diff(current_branch):
+          subprocess.run(["git", "fetch", "origin"])
+          result = subprocess.run(
+            ["git", "diff", "--name-only", current_branch, "origin/main"],
+            capture_output=True, text=True)
+          with open('/tmp/diff.txt', 'w') as f:
+            f.write(result.stdout)
+
+
+        def get_required_path(path, patterns: List):
+          # Split the path into its components
+          parts = path.split(os.sep)
+
+          try:
+            # Iterate over each pattern in the provided patterns list
+            if not any(pattern in parts for pattern in patterns):
+              if "/" in INCLUDE_PATTERNS:
+                print(parts)
+                return os.sep.join(parts[0:DEFAULT_END_INDEX])
+              return ""
+
+            for pattern in patterns:
+              if not pattern in parts:
+                continue
+              # Find the index of the current pattern starting from the start_index
+              start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
+
+              # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
+              pattern_index = parts.index(pattern, start_index)
+
+              # Check if there are at least two more parts after the pattern_index
+              if len(parts) > pattern_index + 2:
+                # Use DEFAULT_END_INDEX as the end index for the slice
+                end_index = DEFAULT_END_INDEX
+                # Join the relevant parts of the path and return the result
+                return os.sep.join(parts[pattern_index:end_index])
+              else:
+                # If the path is too short, return an empty string
+                return os.sep.join(parts[pattern_index:])
+          except (ValueError, IndexError) as e:
+            # If any error occurs (like value not found or index error), return an empty string
+            print(e)
+            return ""
+
+
+        def get_modified_paths(patterns: List, exclude_ignored=True):
+          with open('/tmp/diff.txt') as f:
+            lines = f.readlines()
+          if exclude_ignored:
+            paths = [
+              line.strip()
+              for line in lines
+              if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
+            ]
+          else:
+            paths = [line.strip() for line in lines for pattern in patterns if
+                     pattern in line]
+
+          # Removing duplicates and sorting
+          unique_paths = sorted(set([
+            get_required_path(path, patterns)
+            for path in paths if path
+          ]))
+          return unique_paths
+
+
+        def write_to_file(content, filepath):
+          with open(filepath, 'w') as f:
+            f.write(content)
+
+
+        def main():
+          current_branch = get_current_branch()
+          print(f"Current branch: {current_branch}")
+
+          get_git_diff(current_branch)
+
+          # Combine the results of the two calls into a single list
+          modified_paths = get_modified_paths(INCLUDE_PATTERNS,
+                                              exclude_ignored=EXCLUDE_IGNORED)
+
+          # Join all modified paths into a single string separated by new lines
+          modified_paths_str = "\n".join(modified_paths)
+
+          # Print the results
+          print(f"📌 Modified paths:\n{modified_paths_str}")
+
+          write_to_file(modified_paths_str, "/tmp/paths.txt")
+
+          if not os.getenv('GITHUB_ENV'):
+            os.environ['GITHUB_ENV'] = 'run_static_analysis=false\n'
+
+          if any(pattern in path for pattern in INCLUDE_PATTERNS for path in
+                 modified_paths_str.split("\n")):
+            print("✅ pattern folder changes detected.")
+            with open(os.getenv('GITHUB_ENV'), 'a') as f:
+              f.write('run_static_analysis=true\n')
+          else:
+            print("❌ pattern folders not modified.")
+            with open(os.getenv('GITHUB_ENV'), 'a') as f:
+              f.write('run_static_analysis=false\n')
+
+
+        if __name__ == "__main__":
+          main()
+
+        - name: Read modified paths
+          if: env.run_static_analysis == 'true'
+          id: read_paths
+          run: |
+            modified_paths=$(cat /tmp/paths.txt)
+            echo "Modified paths: $modified_paths"
+            echo "::set-output name=modified_paths::$modified_paths"
+
+        - name: ⏬ Download Modified Folders Only
+          if: env.run_static_analysis == 'true'
+          id: download_changed_folders
+          shell: bash
+          run: |
+            # Read all paths and download only the modified folders
+            MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
+
+            # Include 'scripts' in the list of directories to checkout
+            MODIFIED_FOLDERS+=("scripts")
+
+            # Initialize git sparse-checkout
+            git sparse-checkout init --cone
+
+            # Set each path in MODIFIED_FOLDERS for sparse-checkout
+            git sparse-checkout set "${MODIFIED_FOLDERS[@]}"
+
+            # Checkout the latest changes
+            git checkout
