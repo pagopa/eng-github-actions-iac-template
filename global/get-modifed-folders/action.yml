@@ -45,6 +45,10 @@ runs:
       with:
         python-version: '3.x'
 
+    - name: Install necessary packages
+      shell: bash
+      run: python -m pip install --upgrade pip
+
     - name: 🔨 Get Modified Paths
       id: get-paths
       shell: bash
