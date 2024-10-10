@@ -4,20 +4,19 @@ description: "Retrieve all modified directory and perform a sparse checkout."
 
 inputs:
   starting_index:
-    description: 'Starting index for path filtering'
+    description: '(Optional) Starting index for path filtering'
     default: '/'
     required: true
   default_end_index:
-    description: 'Default end index for path slicing'
+    description: '(Optional) Default end index for path slicing'
     default: 2
     required: true
   include_patterns:
-    description: 'Patterns to include in path filtering, comma separated'
-    default: 'src,domains'
+    description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
-  exclude_ignored:
-    description: 'Whether to exclude ignored paths'
-    default: "True"
+  ignore_patterns:
+    description: '(Optional) Whether to exclude ignored paths'
+    default: ".github,.devops,.vscode,.utils"
     required: true
 
 
@@ -56,17 +55,11 @@ runs:
         import subprocess
         from typing import List
 
-        DEFAULT_IGNORED_PATHS = [
-          ".github",
-          ".devops"
-          ".vscode",
-          ".utils"
-        ]
+        DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
         STARTING_INDEX = "${{ inputs.starting_index }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_index }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
-        EXCLUDE_IGNORED = ${{ inputs.exclude_ignored }}
 
 
         def get_current_branch():
@@ -125,18 +118,14 @@ runs:
             return ""
 
 
-        def get_modified_paths(patterns: List, exclude_ignored=True):
+        def get_modified_paths(patterns: List):
           with open('/tmp/diff.txt') as f:
             lines = f.readlines()
-          if exclude_ignored:
-            paths = [
-              line.strip()
-              for line in lines
-              if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
-            ]
-          else:
-            paths = [line.strip() for line in lines for pattern in patterns if
-                     pattern in line]
+          paths = [
+            line.strip()
+            for line in lines
+            if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
+          ]
 
           # Removing duplicates and sorting
           unique_paths = sorted(set([
@@ -158,8 +147,7 @@ runs:
           get_git_diff(current_branch)
 
           # Combine the results of the two calls into a single list
-          modified_paths = get_modified_paths(INCLUDE_PATTERNS,
-                                              exclude_ignored=EXCLUDE_IGNORED)
+          modified_paths = get_modified_paths(INCLUDE_PATTERNS)
 
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
@@ -168,6 +156,7 @@ runs:
           print(f"📌 Modified paths:\n{modified_paths_str}")
 
           write_to_file(modified_paths_str, "/tmp/paths.txt")
+          print("✅ pattern folder changes detected.")
 
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'run_static_analysis=false\n'
@@ -192,13 +181,12 @@ runs:
       id: download_changed_folders
       shell: bash
       run: |
-        set -x
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
-        echo "${MODIFIED_FOLDERS[@]}"
+
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
 
