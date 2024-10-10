@@ -201,6 +201,7 @@ runs:
       id: download_changed_folders
       shell: bash
       run: |
+        set -x
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
 
