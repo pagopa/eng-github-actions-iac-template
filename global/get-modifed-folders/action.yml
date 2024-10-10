@@ -181,7 +181,7 @@ runs:
       run: |
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
-        echo "Current modified directory: ${MODIFIED_FOLDERS[@]}"
+        echo "📁 Current modified directory: ${MODIFIED_FOLDERS[@]}"
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
