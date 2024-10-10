@@ -156,7 +156,7 @@ runs:
           print(f"📌 Modified paths:\n{modified_paths_str}")
 
           write_to_file(modified_paths_str, "/tmp/paths.txt")
-          print("✅ pattern folder changes detected.")
+          print("📋 paths changed successfully saved.")
 
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'run_static_analysis=false\n'
