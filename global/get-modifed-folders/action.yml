@@ -206,7 +206,7 @@ runs:
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
-
+        echo "${MODIFIED_FOLDERS[@]}"
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
 
