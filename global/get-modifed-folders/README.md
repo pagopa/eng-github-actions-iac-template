@@ -7,19 +7,22 @@ This GitHub Actions workflow retrieves all modified directories and performs a s
 The workflow:
 1. Checks out the repository.
 2. Retrieves modified paths based on include/exclude criteria.
-3. Determines if a static analysis should be run and sets the `run_static_analysis` environment variable.
+3. Determines if a static analysis should be run and sets the `dir_changes_detected` environment variable.
 4. Downloads only the modified folders using git's sparse checkout functionality.
 
 ## Inputs
 
-- `starting_index` (required): Starting index for path filtering. Default: `'/'`.
-- `default_end_index` (required): Default end index for path slicing. Default: `2`.
-- `include_patterns` (required): Patterns to include in path filtering. Default:
+- `starting_index` (Optional): Starting index for path filtering. Default: `'/'`.
+- `default_end_index` (Optional): Default end index for path slicing. Default: `2`.
+- `include_patterns` (Required): Patterns to include in path filtering. Default:
   ```yaml
   "src,domains"
   ```
-- `exclude_ignored` (required): Whether to exclude ignored paths. Default: `True`.
-
+- `exclude_ignored` (Optional): Whether to exclude ignored paths. Default: `True`.
+  ```yaml
+  ".github,.devops,.vscode,.utils"
+  ```
+  
 ## Outputs
 
 - `modified_paths`: List of modified paths obtained.

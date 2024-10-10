@@ -24,9 +24,9 @@ outputs:
   modified_paths:
     description: "List of modified paths"
     value: ${{ steps.get-paths.outputs.modified_paths }}
-  run_static_analysis:
+  dir_changes_detected:
     description: "Determines if static analysis should run"
-    value: ${{ env.run_static_analysis }}
+    value: ${{ env.dir_changes_detected }}
 
 
 runs:
@@ -159,17 +159,17 @@ runs:
           print("📋 paths changed successfully saved.")
 
           if not os.getenv('GITHUB_ENV'):
-            os.environ['GITHUB_ENV'] = 'run_static_analysis=false\n'
+            os.environ['GITHUB_ENV'] = 'dir_changes_detected=false\n'
 
           if any(pattern in path for pattern in INCLUDE_PATTERNS for path in
                  modified_paths_str.split("\n")):
             print("✅ pattern folder changes detected.")
             with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('run_static_analysis=true\n')
+              f.write('dir_changes_detected=true\n')
           else:
             print("❌ pattern folders not modified.")
             with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('run_static_analysis=false\n')
+              f.write('dir_changes_detected=false\n')
 
 
         if __name__ == "__main__":
@@ -177,7 +177,7 @@ runs:
         EOF
 
     - name: ⏬ Download Modified Folders Only
-      if: env.run_static_analysis == 'true'
+      if: env.dir_changes_detected == 'true'
       id: download_changed_folders
       shell: bash
       run: |
