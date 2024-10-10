@@ -72,6 +72,7 @@ runs:
             capture_output=True, text=True)
           with open('/tmp/diff.txt', 'w') as f:
             f.write(result.stdout)
+          print(f"Current diff between {current_branch} and origin/main\n{result.stdout}"
 
 
         def file_check(parts):
@@ -180,6 +181,7 @@ runs:
       run: |
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
+        echo "Current modified directory: ${MODIFIED_FOLDERS[@]}"
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
