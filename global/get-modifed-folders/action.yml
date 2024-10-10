@@ -84,6 +84,12 @@ runs:
             f.write(result.stdout)
 
 
+        def file_check(parts):
+          # Check if the last component of the path is a file and pop it if so
+          if os.path.splitext(parts[-1])[1]:  # Check if the last part has an extension
+            parts.pop()
+          return parts
+
         def get_required_path(path, patterns: List):
           # Split the path into its components
           parts = path.split(os.sep)
@@ -92,8 +98,7 @@ runs:
             # Iterate over each pattern in the provided patterns list
             if not any(pattern in parts for pattern in patterns):
               if "/" in INCLUDE_PATTERNS:
-                print(parts)
-                return os.sep.join(parts[0:DEFAULT_END_INDEX])
+                return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
               return ""
 
             for pattern in patterns:
@@ -104,16 +109,16 @@ runs:
 
               # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
               pattern_index = parts.index(pattern, start_index)
-
               # Check if there are at least two more parts after the pattern_index
               if len(parts) > pattern_index + 2:
                 # Use DEFAULT_END_INDEX as the end index for the slice
                 end_index = DEFAULT_END_INDEX
+
                 # Join the relevant parts of the path and return the result
-                return os.sep.join(parts[pattern_index:end_index])
+                return os.sep.join(file_check(parts)[pattern_index:end_index])
               else:
                 # If the path is too short, return an empty string
-                return os.sep.join(parts[pattern_index:])
+                return os.sep.join(file_check(parts)[pattern_index:])
           except (ValueError, IndexError) as e:
             # If any error occurs (like value not found or index error), return an empty string
             print(e)
