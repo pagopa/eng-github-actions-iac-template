@@ -12,7 +12,7 @@ inputs:
     default: 2
     required: true
   include_patterns:
-    description: 'Patterns to include in path filtering'
+    description: 'Patterns to include in path filtering, comma separated'
     default: 'src,domains'
     required: true
   exclude_ignored:
@@ -62,10 +62,10 @@ runs:
           ".vscode",
           ".utils"
         ]
-        print("${{ inputs.include_patterns }}")
+
         STARTING_INDEX = "${{ inputs.starting_index }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_index }}
-        INCLUDE_PATTERNS = ${{ inputs.include_patterns }}
+        INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
         EXCLUDE_IGNORED = ${{ inputs.exclude_ignored }}
 
 
