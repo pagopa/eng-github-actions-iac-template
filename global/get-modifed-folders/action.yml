@@ -187,15 +187,6 @@ runs:
           main()
         EOF
 
-    - name: Read modified paths
-      if: env.run_static_analysis == 'true'
-      shell: bash
-      id: read_paths
-      run: |
-        modified_paths=$(cat /tmp/paths.txt)
-        echo "Modified paths: $modified_paths"
-        echo "name=modified_paths=$modified_paths" >> $GITHUB_OUTPUT
-
     - name: ⏬ Download Modified Folders Only
       if: env.run_static_analysis == 'true'
       id: download_changed_folders
