@@ -6,18 +6,15 @@ inputs:
   starting_index:
     description: '(Optional) Starting index for path filtering'
     default: '/'
-    required: true
   default_end_index:
     description: '(Optional) Default end index for path slicing'
     default: 2
-    required: true
   include_patterns:
     description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
     default: ".github,.devops,.vscode,.utils"
-    required: true
 
 
 outputs:

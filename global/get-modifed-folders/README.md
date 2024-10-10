@@ -14,11 +14,11 @@ The workflow:
 
 - `starting_index` (Optional): Starting index for path filtering. Default: `'/'`.
 - `default_end_index` (Optional): Default end index for path slicing. Default: `2`.
-- `include_patterns` (Required): Patterns to include in path filtering. Default:
+- `include_patterns` (Required): Patterns to include in path filtering. Example:
   ```yaml
   "src,domains"
   ```
-- `exclude_ignored` (Optional): Whether to exclude ignored paths. Default: `True`.
+- `exclude_ignored` (Optional): Whether to exclude ignored paths. Example:
   ```yaml
   ".github,.devops,.vscode,.utils"
   ```
