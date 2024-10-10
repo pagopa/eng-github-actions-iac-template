@@ -26,7 +26,7 @@ The workflow:
 ## Outputs
 
 - `modified_paths`: List of modified paths obtained.
-- `run_static_analysis`: Determines if static analysis should run.
+- `dir_changes_detected`: Determines if static analysis should run.
 
 ## Example Usage
 
