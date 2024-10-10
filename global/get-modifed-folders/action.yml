@@ -72,7 +72,7 @@ runs:
             capture_output=True, text=True)
           with open('/tmp/diff.txt', 'w') as f:
             f.write(result.stdout)
-          print(f"Current diff between {current_branch} and origin/main\n{result.stdout}\n")
+          print(f"👷🏻‍♂️ Current diff between {current_branch} and origin/main\n{result.stdout}\n")
 
 
         def file_check(parts):
