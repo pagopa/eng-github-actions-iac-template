@@ -16,10 +16,9 @@ The workflow:
 - `default_end_index` (required): Default end index for path slicing. Default: `2`.
 - `include_patterns` (required): Patterns to include in path filtering. Default:
   ```yaml
-  - src
-  - domains
+  "src,domains"
   ```
-- `exclude_ignored` (required): Whether to exclude ignored paths. Default: `true`.
+- `exclude_ignored` (required): Whether to exclude ignored paths. Default: `True`.
 
 ## Outputs
 
@@ -29,7 +28,13 @@ The workflow:
 ## Example Usage
 
 ```yaml
-
+      - name: 🔨 Get Modified Paths
+        id: get-paths
+        uses: pagopa/eng-github-actions-iac-template/global/get-modifed-folders@main
+        with:
+          starting_index: "src"
+          default_end_index: 3
+          include_patterns: "src,domains"
 ```
 
 ## Notes
