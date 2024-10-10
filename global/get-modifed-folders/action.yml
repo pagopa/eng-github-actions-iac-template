@@ -17,7 +17,7 @@ inputs:
     required: true
   exclude_ignored:
     description: 'Whether to exclude ignored paths'
-    default: True
+    default: "True"
     required: true
 
 
