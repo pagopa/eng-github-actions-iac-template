@@ -12,8 +12,8 @@ The workflow:
 
 ## Inputs
 
-- `starting_index` (Optional): Starting index for path filtering. Default: `'/'`.
-- `default_end_index` (Optional): Default end index for path slicing. Default: `2`.
+- `start_folder` (Optional): Starting index for path filtering. Default: `'/'`.
+- `default_end_folder_depth` (Optional): Default end index for path slicing. Default: `2`.
 - `include_patterns` (Required): Patterns to include in path filtering. Example:
   ```yaml
   "src,domains"
@@ -35,8 +35,8 @@ The workflow:
         id: get-paths
         uses: pagopa/eng-github-actions-iac-template/global/get-modifed-folders@main
         with:
-          starting_index: "src"
-          default_end_index: 3
+          start_folder: "src"
+          default_end_folder_depth: 3
           include_patterns: "src,domains"
 ```
 
