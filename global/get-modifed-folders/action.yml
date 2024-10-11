@@ -3,10 +3,10 @@ description: "Retrieve all modified directory and perform a sparse checkout."
 
 
 inputs:
-  starting_index:
+  start_folder:
     description: '(Optional) Starting index for path filtering'
     default: '/'
-  default_end_index:
+  default_end_folder_depth:
     description: '(Optional) Default end index for path slicing'
     default: 2
   include_patterns:
@@ -54,8 +54,8 @@ runs:
 
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
-        STARTING_INDEX = "${{ inputs.starting_index }}"
-        DEFAULT_END_INDEX = ${{ inputs.default_end_index }}
+        STARTING_INDEX = "${{ inputs.start_folder }}"
+        DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
 
 
