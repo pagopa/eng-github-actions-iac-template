@@ -75,7 +75,7 @@ runs:
 
       - name: Release
         id: _release
-        # from https://github.com/cycjimmy/semantic-release-action/commits/main
+        # from https://github.com/cycjimmy/semantic-release-action/releases/tag/v4.1.1
         uses: cycjimmy/semantic-release-action@b1b432f13acb7768e0c8efdec416d363a57546f2 #v4.1.1
         with:
           semantic_version: ${{ inputs.semantic_version }}
