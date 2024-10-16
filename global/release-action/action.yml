@@ -40,7 +40,7 @@ inputs:
   semantic_version:
     description: "(Optional) Specify version range for semantic-release."
     required: false
-    default: 23.1.1
+    default: 24.1.1
   ci:
     description: "(Optional) Whether to run semantic release with CI support."
     required: false
