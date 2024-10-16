@@ -81,7 +81,8 @@ runs:
           semantic_version: ${{ inputs.semantic_version }}
           ci: ${{ inputs.ci }}
           branches: ${{ inputs.branches }}
-          extra_plugins: ${{ inputs.extra_plugins }}
+          extra_plugins: |
+            ${{ inputs.extra_plugins }}
           tag_format: ${{ inputs.tag_format }}
         env:
           GITHUB_TOKEN: ${{ inputs.github_token }}
