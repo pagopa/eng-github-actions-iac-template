@@ -159,20 +159,20 @@ runs:
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'dir_changes_detected=false\n'
 
-          file_path = '/tmp/paths.txt'
           try:
-              if os.path.getsize(file_path) > 0:
-                print("✅ pattern folder changes detected.")
-                with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                  f.write('dir_changes_detected=true\n')
-              else:
-                print("❌ pattern folders not modified.")
-                with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                  f.write('dir_changes_detected=false\n')
+            file_path = '/tmp/paths.txt'
+            if os.path.getsize(file_path) > 0:
+              print("✅ pattern folder changes detected.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=true\n')
+            else:
+              print("❌ pattern folders not modified.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=false\n')
           except FileNotFoundError:
-                print("‼️ the paths.txt file does not exist.")
-                with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                  f.write('dir_changes_detected=false\n')
+              print("‼️ the paths.txt file does not exist.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=false\n')
 
         if __name__ == "__main__":
           main()
