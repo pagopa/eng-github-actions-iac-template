@@ -14,7 +14,7 @@ inputs:
     required: true
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
-    default: ".github,.devops,.vscode,.utils"
+    default: ".github,.devops,.vscode"
 
 
 outputs:
@@ -159,16 +159,20 @@ runs:
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'dir_changes_detected=false\n'
 
-          if any(pattern in path for pattern in INCLUDE_PATTERNS for path in
-                 modified_paths_str.split("\n")):
-            print("✅ pattern folder changes detected.")
-            with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('dir_changes_detected=true\n')
-          else:
-            print("❌ pattern folders not modified.")
-            with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('dir_changes_detected=false\n')
-
+          try:
+            file_path = '/tmp/paths.txt'
+            if os.path.getsize(file_path) > 0:
+              print("✅ pattern folder changes detected.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=true\n')
+            else:
+              print("❌ pattern folders not modified.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=false\n')
+          except FileNotFoundError:
+              print("‼️ the paths.txt file does not exist.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=false\n')
 
         if __name__ == "__main__":
           main()
@@ -185,6 +189,9 @@ runs:
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
+
+        # Include 'utils' in the list of directories to checkout
+        MODIFIED_FOLDERS+=(".utils")
 
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
