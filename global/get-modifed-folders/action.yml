@@ -159,6 +159,7 @@ runs:
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'dir_changes_detected=false\n'
 
+          file_path = '/tmp/paths.txt'
           try:
               if os.path.getsize(file_path) > 0:
                 print("✅ pattern folder changes detected.")
