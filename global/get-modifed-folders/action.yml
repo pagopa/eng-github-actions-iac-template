@@ -14,7 +14,7 @@ inputs:
     required: true
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
-    default: ".github,.devops,.vscode,.utils"
+    default: ".github,.devops,.vscode"
 
 
 outputs:
@@ -189,6 +189,9 @@ runs:
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts")
+
+        # Include 'utils' in the list of directories to checkout
+        MODIFIED_FOLDERS+=("utils")
 
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
