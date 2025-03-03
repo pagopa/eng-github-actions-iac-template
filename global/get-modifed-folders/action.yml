@@ -14,7 +14,7 @@ inputs:
     required: true
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
-    default: ".github,.devops,.vscode,.utils"
+    default: ".github,.devops,.vscode"
 
 
 outputs:
@@ -201,7 +201,6 @@ runs:
               with open(os.getenv('GITHUB_ENV'), 'a') as f:
                 f.write('dir_changes_detected=false\n')
 
-
         if __name__ == "__main__":
           main()
         EOF
@@ -217,6 +216,9 @@ runs:
 
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts" ".utils")
+
+        # Include 'utils' in the list of directories to checkout
+        MODIFIED_FOLDERS+=(".utils")
 
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
