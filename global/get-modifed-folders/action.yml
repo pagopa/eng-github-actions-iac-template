@@ -169,6 +169,7 @@ runs:
 
           # Combine the results of the two calls into a single list
           modified_paths = get_modified_paths(INCLUDE_PATTERNS)
+          print(modified_paths)
 
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
