@@ -51,6 +51,7 @@ runs:
         import os
         import subprocess
         from typing import List
+        import re
 
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
