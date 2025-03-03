@@ -131,6 +131,8 @@ runs:
                       local_import_paths.append(full_path)
               except IsADirectoryError:
                 continue
+              except FileNotFoundError:
+                continue
           return local_import_paths
 
 
