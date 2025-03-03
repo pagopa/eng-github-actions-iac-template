@@ -149,7 +149,6 @@ runs:
             get_required_path(path, patterns)
             for path in paths if path
           ]))
-          print(unique_paths)
           unique_paths.extend(inspect_for_source_dependence(unique_paths))
           return unique_paths
 
@@ -167,7 +166,6 @@ runs:
 
           # Combine the results of the two calls into a single list
           modified_paths = get_modified_paths(INCLUDE_PATTERNS)
-          print(modified_paths)
 
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
@@ -181,16 +179,23 @@ runs:
           if not os.getenv('GITHUB_ENV'):
             os.environ['GITHUB_ENV'] = 'dir_changes_detected=false\n'
 
-          if any(pattern in path for pattern in INCLUDE_PATTERNS for path in
-                 modified_paths_str.split("\n")):
-            print("✅ pattern folder changes detected.")
-            with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('dir_changes_detected=true\n')
+          # Condition to accept any string (no filter applied)
+          if not INCLUDE_PATTERNS or "*" in INCLUDE_PATTERNS or "/" in INCLUDE_PATTERNS:
+              print("🔍 No filter applied: considering all strings.")
+              matched_paths = modified_paths_str.split("\n")  # All paths are accepted
           else:
-            print("❌ pattern folders not modified.")
-            with open(os.getenv('GITHUB_ENV'), 'a') as f:
-              f.write('dir_changes_detected=false\n')
+              print("🔍 Active filter: verifying matches with specific patterns.")
+              # Filter paths based on the specified patterns
+              matched_paths = [
+                  path for path in modified_paths_str.split("\n")
+                  if any(pattern in path for pattern in INCLUDE_PATTERNS)
+              ]
 
+          # Process the results or execute actions on the matched paths
+          if matched_paths:
+              print(f"✅ The following matching paths were found: {matched_paths}")
+          else:
+              print("❌ No paths match the specified filters.")
 
         if __name__ == "__main__":
           main()
