@@ -151,6 +151,7 @@ runs:
             get_required_path(path, patterns)
             for path in paths if path
           ]))
+          print(unique_paths)
           unique_paths.extend(inspect_for_source_dependence(unique_paths))
           return unique_paths
 
