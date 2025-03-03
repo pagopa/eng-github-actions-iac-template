@@ -115,7 +115,7 @@ runs:
             print(e)
             return ""
 
-        def inspect_for_source_dependence(paths):
+        def inspect_for_source_dependence(paths: List):
           local_import_paths = []
           for path in paths:
             try:
@@ -147,8 +147,7 @@ runs:
             get_required_path(path, patterns)
             for path in paths if path
           ]))
-          unique_paths.extend(inspect_for_source_dependence(unique_paths))
-          print(unique_paths)
+          unique_paths.extend(inspect_for_source_dependence(list(unique_paths)))
           return unique_paths
 
 
