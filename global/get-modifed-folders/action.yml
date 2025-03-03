@@ -194,8 +194,13 @@ runs:
           # Process the results or execute actions on the matched paths
           if matched_paths:
               print(f"✅ The following matching paths were found: {matched_paths}")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=true\n')
           else:
               print("❌ No paths match the specified filters.")
+              with open(os.getenv('GITHUB_ENV'), 'a') as f:
+                f.write('dir_changes_detected=false\n')
+
 
         if __name__ == "__main__":
           main()
