@@ -119,7 +119,7 @@ runs:
           local_import_paths = []
           for path in paths:
             try:
-              with open(file, 'r') as file_reader:
+              with open(path, 'r') as file_reader:
                 for line in file_reader:
                   # Regex to match local source paths
                   local_import_pattern = r'source\s*=\s*["\'](\./|file://|\.\./)([^"\']*)["\']'
