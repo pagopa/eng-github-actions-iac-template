@@ -152,6 +152,7 @@ runs:
             for path in paths if path
           ]))
           unique_paths.extend(inspect_for_source_dependence(unique_paths))
+          print(unique_paths)
           return unique_paths
 
 
