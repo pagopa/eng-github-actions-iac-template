@@ -128,7 +128,7 @@ runs:
                     match = re.search(local_import_pattern, line)
                     if match:
                       # Combine the local reference (./ or file://) and the remaining path
-                      full_path = match.group(1) + match.group(2)
+                      full_path = match.group(2)
                       local_import_paths.append(full_path)
               except IsADirectoryError:
                 continue
