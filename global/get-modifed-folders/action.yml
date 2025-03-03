@@ -115,7 +115,7 @@ runs:
             print(e)
             return ""
 
-        def inspect_for_source_dependence(paths: List):
+        def inspect_for_source_dependence(paths):
           local_import_paths = []
           for path in paths:
             with open(path, 'r') as file_reader:
