@@ -131,9 +131,9 @@ runs:
                         full_path = match.group(1) + match.group(2)
                         local_import_paths.append(full_path)
             except IsADirectoryError:
-              continue
+              pass
             except FileNotFoundError:
-              continue
+              pass
           return local_import_paths
 
 
