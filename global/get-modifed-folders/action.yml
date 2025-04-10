@@ -98,7 +98,6 @@ runs:
             if not any(pattern in parts for pattern in patterns):
               print("🔎 No matching pattern found in path components")
               if "/" in INCLUDE_PATTERNS:
-                print(f"♾️ Using default end index: {DEFAULT_END_INDEX}")
                 return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
               return ""
 
@@ -160,7 +159,6 @@ runs:
               except (IsADirectoryError, UnicodeDecodeError) as e:
                 print(f"❌ Error processing file {file_path}: {e}")
                 continue
-          return local_import_paths
 
         def get_modified_paths(patterns: List):
           with open('/tmp/diff.txt') as f:
@@ -174,23 +172,13 @@ runs:
           ]
           print(f"🚫 Filtered out paths containing ignored patterns: {DEFAULT_IGNORED_PATHS}")
 
-          # Log ignored paths and filter them out
-          ignored_paths = [path for path in paths if path.startswith('../')]
-          print(f"⚠️ Skipping paths starting with '../': {ignored_paths}")
-
-          # Exclude paths starting with '../' and normalize remaining paths
           valid_paths = []
           for path in paths:
-            if path.startswith('../'):
-              normalized_path = path.replace('../', '', 1)
-              if normalized_path not in valid_paths:
-                valid_paths.append(normalized_path)
-                print(f"✨ Normalized path: {normalized_path}")
-            else:
-              if path not in valid_paths:
-                valid_paths.append(path)
+            if path not in valid_paths:
+              valid_paths.append(path)
 
           print(f"📋 Processing {len(valid_paths)} valid paths")
+          
           # Removing duplicates and sorting
           unique_paths = sorted(set([
             get_required_path(path, patterns)
@@ -199,11 +187,11 @@ runs:
 
           # Filter out empty strings and ensure unique paths
           unique_paths = list(filter(None, unique_paths))
-          print(f"🎯 Found {len(unique_paths)} unique paths after filtering")
 
           print("🔍 Checking for source dependencies...")
           unique_paths.extend(inspect_for_source_dependence(unique_paths))
           final_paths = list(dict.fromkeys(unique_paths))
+          final_paths = [path for path in final_paths if not path.startswith('../')]
           print(f"✅ Final number of paths to process: {len(final_paths)}")
           return final_paths
 
