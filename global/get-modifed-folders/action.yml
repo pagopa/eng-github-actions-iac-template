@@ -157,6 +157,10 @@ runs:
             if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
           ]
 
+          # Log ignored paths
+          ignored_paths = [path for path in paths if path.startswith('../')]
+          print(f"ℹ️[INFO] Ignored paths: {ignored_paths}")
+
           # Exclude paths starting with '../'
           paths = [path for path in paths if not path.startswith('../')]
 
