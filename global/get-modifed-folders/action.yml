@@ -162,10 +162,12 @@ runs:
           current_branch = get_current_branch()
           print(f"Current branch: {current_branch}")
 
+          print("🔍 get_git_diff")
           get_git_diff(current_branch)
 
           # Combine the results of the two calls into a single list
           modified_paths = get_modified_paths(INCLUDE_PATTERNS)
+          print(f"🔍 get_modified_paths\n{modified_paths}")
 
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
@@ -183,6 +185,7 @@ runs:
           if not INCLUDE_PATTERNS or "*" in INCLUDE_PATTERNS or "/" in INCLUDE_PATTERNS:
               print("🔍 No filter applied: considering all strings.")
               matched_paths = modified_paths_str.split("\n")  # All paths are accepted
+              print(f"🐳 The following paths were found: {matched_paths}")
           else:
               print("🔍 Active filter: verifying matches with specific patterns.")
               # Filter paths based on the specified patterns
@@ -190,6 +193,7 @@ runs:
                   path for path in modified_paths_str.split("\n")
                   if any(pattern in path for pattern in INCLUDE_PATTERNS)
               ]
+              print(f"🛠️ The following paths were found: {matched_paths}")
 
           # Process the results or execute actions on the matched paths
           if matched_paths:
