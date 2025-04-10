@@ -164,21 +164,25 @@ runs:
 
 
         def get_modified_paths(patterns: List):
-          with open('/tmp/diff.txt') as f:
-            lines = f.readlines()
-          paths = [
-            line.strip()
-            for line in lines
-            if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
-          ]
+            with open('/tmp/diff.txt') as f:
+                lines = f.readlines()
+            paths = [
+                line.strip()
+                for line in lines
+                if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
+            ]
 
-          # Removing duplicates and sorting
-          unique_paths = sorted(set([
-            get_required_path(path, patterns)
-            for path in paths if path
-          ]))
-          unique_paths.extend(inspect_for_source_dependence(unique_paths))
-          return unique_paths
+            # Removing duplicates and sorting
+            unique_paths = sorted(set([
+                get_required_path(path, patterns)
+                for path in paths if path
+            ]))
+            unique_paths.extend(inspect_for_source_dependence(unique_paths))
+
+            # Filtra per escludere i percorsi che iniziano con '../'
+            filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+
+            return filtered_paths
 
 
         def write_to_file(content, filepath):
