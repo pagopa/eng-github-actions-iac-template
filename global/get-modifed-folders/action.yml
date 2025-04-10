@@ -8,7 +8,7 @@ inputs:
     default: '/'
   default_end_folder_depth:
     description: '(Optional) Default end index for path slicing'
-    default: 2
+    default: "2"
   include_patterns:
     description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
@@ -52,6 +52,7 @@ runs:
         import subprocess
         from typing import List
         import re
+        import mimetypes
 
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
@@ -121,7 +122,14 @@ runs:
           for path in paths:
             for file in os.listdir(path):
               try:
-                with open(os.path.join(path, file), 'r') as file_reader:
+                file_path = os.path.join(path, file)
+                # Skip binary files by checking their MIME type
+                mime_type, _ = mimetypes.guess_type(file_path)
+                if mime_type and not mime_type.startswith("text"):
+                  print(f"[INFO] Ignored binary file: {file_path}")
+                  continue
+
+                with open(file_path, 'r', encoding='utf-8') as file_reader:
                   for line in file_reader:
                     # Regex to match local source paths
                     local_import_pattern = r'source\s*=\s*["\'](\./|file://|\.\./)([^"\']*)["\']'
@@ -130,7 +138,8 @@ runs:
                       # Combine the local reference (./ or file://) and the remaining path
                       full_path = match.group(2)
                       local_import_paths.append(full_path)
-              except IsADirectoryError:
+              except (IsADirectoryError, UnicodeDecodeError) as e:
+                print(f"[ERROR] Failed to process file: {file_path}. Error: {e}")
                 continue
           return local_import_paths
 
