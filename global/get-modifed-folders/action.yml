@@ -157,6 +157,9 @@ runs:
             if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
           ]
 
+          # Exclude paths starting with '../'
+          paths = [path for path in paths if not path.startswith('../')]
+
           # Removing duplicates and sorting
           unique_paths = sorted(set([
             get_required_path(path, patterns)
