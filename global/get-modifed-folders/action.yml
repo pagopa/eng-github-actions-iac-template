@@ -87,6 +87,10 @@ runs:
           # Split the path into its components
           parts = path.split(os.sep)
 
+          # Exclude paths starting with '../'
+          if path.startswith('../'):
+            return ""
+
           try:
             # Iterate over each pattern in the provided patterns list
             if not any(pattern in parts for pattern in patterns):
