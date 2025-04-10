@@ -157,20 +157,32 @@ runs:
             if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
           ]
 
-          # Log ignored paths
+          # Log ignored paths and filter them out
           ignored_paths = [path for path in paths if path.startswith('../')]
           print(f"ℹ️[INFO] Ignored paths: {ignored_paths}")
 
-          # Exclude paths starting with '../'
-          paths = [path for path in paths if not path.startswith('../')]
+          # Exclude paths starting with '../' and normalize remaining paths
+          valid_paths = []
+          for path in paths:
+              if path.startswith('../'):
+                  # Remove the '../' prefix and add to valid paths
+                  normalized_path = path.replace('../', '', 1)
+                  if normalized_path not in valid_paths:
+                      valid_paths.append(normalized_path)
+              else:
+                  if path not in valid_paths:
+                      valid_paths.append(path)
 
           # Removing duplicates and sorting
           unique_paths = sorted(set([
             get_required_path(path, patterns)
-            for path in paths if path
+            for path in valid_paths if path
           ]))
+
+          # Filter out empty strings and ensure unique paths
+          unique_paths = list(filter(None, unique_paths))
           unique_paths.extend(inspect_for_source_dependence(unique_paths))
-          return unique_paths
+          return list(dict.fromkeys(unique_paths))  # Remove duplicates while preserving order
 
 
         def write_to_file(content, filepath):
