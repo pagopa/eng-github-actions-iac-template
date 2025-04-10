@@ -90,17 +90,14 @@ runs:
 
         def get_required_path(path, patterns: List):
           print(f"🔍 Starting get_required_path function for path: {path}")
-          # Split the path into its components
           parts = path.split(os.sep)
           print(f"📂 Path components: {parts}")
 
-          # Exclude paths starting with '../'
           if path.startswith('../'):
             print("⚠️ Path starts with '../', skipping...")
             return ""
 
           try:
-            # Iterate over each pattern in the provided patterns list
             if not any(pattern in parts for pattern in patterns):
               print("🔎 No matching pattern found in path components")
               if "/" in INCLUDE_PATTERNS:
@@ -109,19 +106,16 @@ runs:
               return ""
 
             for pattern in patterns:
-              if not pattern in parts:
+              if pattern not in parts:
                 print(f"⏭️ Pattern '{pattern}' not found in path, continuing...")
                 continue
               print(f"✅ Found matching pattern: {pattern}")
-              # Find the index of the current pattern starting from the start_index
               start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
               print(f"📌 Start index: {start_index}")
 
-              # Find the index of pattern
               pattern_index = parts.index(pattern, start_index)
               print(f"🎯 Pattern index: {pattern_index}")
 
-              # Check if there are at least two more parts after the pattern_index
               if len(parts) > pattern_index + 2:
                 end_index = DEFAULT_END_INDEX
                 print(f"📐 Using end index: {end_index}")
@@ -138,10 +132,19 @@ runs:
           local_import_paths = []
           for path in paths:
             print(f"📂 Inspecting path: {path}")
+            # Check if path is a directory
+            if not os.path.isdir(path):
+              print(f"⏩ Skipping: {path} - Not a directory")
+              continue
+
             for file in os.listdir(path):
               try:
                 file_path = os.path.join(path, file)
                 print(f"📄 Processing file: {file_path}")
+                # Skip if file is a directory
+                if os.path.isdir(file_path):
+                  print(f"⏩ Skipping directory: {file_path}")
+                  continue
                 # Skip binary files by checking their MIME type
                 mime_type, _ = mimetypes.guess_type(file_path)
                 if mime_type and not mime_type.startswith("text"):
@@ -163,7 +166,6 @@ runs:
                 continue
           return local_import_paths
 
-
         def get_modified_paths(patterns: List):
           print("🔍 Starting get_modified_paths function")
           with open('/tmp/diff.txt') as f:
@@ -184,14 +186,14 @@ runs:
           # Exclude paths starting with '../' and normalize remaining paths
           valid_paths = []
           for path in paths:
-              if path.startswith('../'):
-                  normalized_path = path.replace('../', '', 1)
-                  if normalized_path not in valid_paths:
-                      valid_paths.append(normalized_path)
-                      print(f"✨ Normalized path: {normalized_path}")
-              else:
-                  if path not in valid_paths:
-                      valid_paths.append(path)
+            if path.startswith('../'):
+              normalized_path = path.replace('../', '', 1)
+              if normalized_path not in valid_paths:
+                valid_paths.append(normalized_path)
+                print(f"✨ Normalized path: {normalized_path}")
+            else:
+              if path not in valid_paths:
+                valid_paths.append(path)
 
           print(f"📋 Processing {len(valid_paths)} valid paths")
           # Removing duplicates and sorting
@@ -209,7 +211,6 @@ runs:
           final_paths = list(dict.fromkeys(unique_paths))
           print(f"✅ Final number of paths to process: {len(final_paths)}")
           return final_paths
-
 
         def write_to_file(content, filepath):
           with open(filepath, 'w') as f:
@@ -242,26 +243,26 @@ runs:
 
           # Condition to accept any string (no filter applied)
           if not INCLUDE_PATTERNS or "*" in INCLUDE_PATTERNS or "/" in INCLUDE_PATTERNS:
-              print("🔓 No filter patterns - accepting all paths")
-              matched_paths = modified_paths_str.split("\n")
+            print("🔓 No filter patterns - accepting all paths")
+            matched_paths = modified_paths_str.split("\n")
           else:
-              print(f"🔎 Filtering paths with patterns: {INCLUDE_PATTERNS}")
-              matched_paths = [
-                  path for path in modified_paths_str.split("\n")
-                  if any(pattern in path for pattern in INCLUDE_PATTERNS)
-              ]
+            print(f"🔎 Filtering paths with patterns: {INCLUDE_PATTERNS}")
+            matched_paths = [
+              path for path in modified_paths_str.split("\n")
+              if any(pattern in path for pattern in INCLUDE_PATTERNS)
+            ]
 
           # Process the results or execute actions on the matched paths
           if matched_paths:
-              print(f"✅ Found {len(matched_paths)} matching paths")
-              with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                f.write('dir_changes_detected=true\n')
-              print("🟢 Set dir_changes_detected=true")
+            print(f"✅ Found {len(matched_paths)} matching paths")
+            with open(os.getenv('GITHUB_ENV'), 'a') as f:
+              f.write('dir_changes_detected=true\n')
+            print("🟢 Set dir_changes_detected=true")
           else:
-              print("❌ No paths match the specified filters")
-              with open(os.getenv('GITHUB_ENV'), 'a') as f:
-                f.write('dir_changes_detected=false\n')
-              print("🔴 Set dir_changes_detected=false")
+            print("❌ No paths match the specified filters")
+            with open(os.getenv('GITHUB_ENV'), 'a') as f:
+              f.write('dir_changes_detected=false\n')
+            print("🔴 Set dir_changes_detected=false")
 
         if __name__ == "__main__":
           main()
