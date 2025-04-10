@@ -62,10 +62,8 @@ runs:
 
 
         def get_current_branch():
-          print("🌳 Starting get_current_branch function")
           result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
                                   capture_output=True, text=True)
-          print(f"🔄 Found branch: {result.stdout.strip()}")
           return result.stdout.strip()
 
 
@@ -89,7 +87,6 @@ runs:
           return parts
 
         def get_required_path(path, patterns: List):
-          print(f"🔍 Starting get_required_path function for path: {path}")
           parts = path.split(os.sep)
           print(f"📂 Path components: {parts}")
 
@@ -128,7 +125,6 @@ runs:
             return ""
 
         def inspect_for_source_dependence(paths):
-          print("🔍 Starting inspect_for_source_dependence function")
           local_import_paths = []
           for path in paths:
             print(f"📂 Inspecting path: {path}")
@@ -167,7 +163,6 @@ runs:
           return local_import_paths
 
         def get_modified_paths(patterns: List):
-          print("🔍 Starting get_modified_paths function")
           with open('/tmp/diff.txt') as f:
             lines = f.readlines()
           print(f"📖 Reading {len(lines)} lines from diff file")
@@ -220,8 +215,8 @@ runs:
         def main():
           print("🚀 Starting main execution")
           current_branch = get_current_branch()
-          print(f"🌳 Working on branch: {current_branch}")
 
+          print(f"🌳 Working on branch: {current_branch}")
           get_git_diff(current_branch)
 
           # Combine the results of the two calls into a single list
@@ -233,7 +228,6 @@ runs:
 
           # Print the results
           print(f"📝 Modified paths:\n{modified_paths_str}")
-
           write_to_file(modified_paths_str, "/tmp/paths.txt")
           print("💾 Paths saved to temporary file")
 
