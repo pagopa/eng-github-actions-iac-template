@@ -12,6 +12,10 @@ inputs:
   include_patterns:
     description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
+  stopper_folders:
+    description: '(Required) Pattern to stop at directory before the configured parameter. Example: "env" will stop at any folder named "env"'
+    required: true
+    default: "env"
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
     default: ".github,.devops,.vscode"
@@ -62,6 +66,7 @@ runs:
         STARTING_INDEX = "${{ inputs.start_folder }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
+        STOPPER_FOLDER = "${{ inputs.stopper_folders }}".split(",")
         INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
 
 
@@ -88,38 +93,46 @@ runs:
           return parts
 
         def get_required_path(path, patterns: List):
-          # Split the path into its components
-          parts = path.split(os.sep)
+          dirs = os.path.dirname(path)
+          parts = dirs.split(os.sep)
+          if "env" in parts:
+            index_env = parts.index("env")
+            return os.sep.join(parts[:index_env])
+          else:
+            return dirs
 
-          try:
-            # Iterate over each pattern in the provided patterns list
-            if not any(pattern in parts for pattern in patterns):
-              if "/" in INCLUDE_PATTERNS:
-                return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
-              return ""
+          ## Split the path into its components
+          #parts = path.split(os.sep)
 
-            for pattern in patterns:
-              if not pattern in parts:
-                continue
-              # Find the index of the current pattern starting from the start_index
-              start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
+          #try:
+          #  # Iterate over each pattern in the provided patterns list
+          #  if not any(pattern in parts for pattern in patterns):
+          #    if "/" in INCLUDE_PATTERNS:
+          #      return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
+          #    return ""
 
-              # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
-              pattern_index = parts.index(pattern, start_index)
-              # Check if there are at least two more parts after the pattern_index
-              if len(parts) > pattern_index + 2:
-                # Use DEFAULT_END_INDEX as the end index for the slice
-                end_index = DEFAULT_END_INDEX
+          #  for pattern in patterns:
+          #    if not pattern in parts:
+          #      continue
+          #    # Find the index of the current pattern starting from the start_index
+          #    start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
 
-                # Join the relevant parts of the path and return the result
-                return os.sep.join(file_check(parts)[pattern_index:end_index])
-              else:
-                # If the path is too short, return an empty string
-                return os.sep.join(file_check(parts)[pattern_index:])
-          except (ValueError, IndexError) as e:
-            # If any error occurs (like value not found or index error), return an empty string
-            print(e)
-            return ""
+          #    # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
+          #    pattern_index = parts.index(pattern, start_index)
+          #    # Check if there are at least two more parts after the pattern_index
+          #    if len(parts) > pattern_index + 2:
+          #      # Use DEFAULT_END_INDEX as the end index for the slice
+          #      end_index = DEFAULT_END_INDEX
+
+          #      # Join the relevant parts of the path and return the result
+          #      return os.sep.join(file_check(parts)[pattern_index:end_index])
+          #    else:
+          #      # If the path is too short, return an empty string
+          #      return os.sep.join(file_check(parts)[pattern_index:])
+          #except (ValueError, IndexError) as e:
+          #  # If any error occurs (like value not found or index error), return an empty string
+          #  print(e)
+          #  return ""
 
         def inspect_for_source_dependence(paths):
             local_import_paths = []
