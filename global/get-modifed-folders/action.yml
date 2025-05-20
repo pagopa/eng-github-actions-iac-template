@@ -123,7 +123,7 @@ runs:
 
         def inspect_for_source_dependence(paths):
             local_import_paths = []
-
+            print(f"PATHS: {paths}")
             def is_binary_file(file_path):
                 """Controlla se un file è binario analizzando i primi byte."""
                 try:
