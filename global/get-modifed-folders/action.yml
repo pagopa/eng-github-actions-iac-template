@@ -15,6 +15,9 @@ inputs:
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
     default: ".github,.devops,.vscode"
+  include_folders:
+    description: '(Optional) Folders to include in the sparse checkout'
+    default: "scripts,.utils"
 
 
 outputs:
@@ -58,6 +61,7 @@ runs:
         STARTING_INDEX = "${{ inputs.start_folder }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
+        INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
 
 
         def get_current_branch():
@@ -200,6 +204,9 @@ runs:
           modified_paths = get_modified_paths(INCLUDE_PATTERNS)
           print(f"🔍 get_modified_paths\n{modified_paths}")
 
+          # Add included folders in modified paths
+          modified_paths.extend(INCLUDE_FOLDERS)
+
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
 
@@ -248,9 +255,6 @@ runs:
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
         echo "📁 Current modified directory: ${MODIFIED_FOLDERS[@]}"
-
-        # Include 'scripts' in the list of directories to checkout
-        MODIFIED_FOLDERS+=("scripts" ".utils")
 
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
