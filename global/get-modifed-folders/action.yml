@@ -144,7 +144,7 @@ runs:
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
 
-                    if pathlib.Path(file_name.suffix).lower() == ".md":
+                    if pathlib.Path(file_name).suffix.lower() == ".md":
                         continue
 
                     # Salta le directory
