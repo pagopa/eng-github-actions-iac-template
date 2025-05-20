@@ -153,13 +153,12 @@ runs:
                                 local_import_pattern = r'source\s*=\s*["\']((?:\.{1,2}/|file://)[^"\']*)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
-                                    # Combina il riferimento locale (./ o file://) e il resto del percorso
-                                    full_path = match.group(2)
+                                    raw_path = match.group(1)
+                                    rel_path = raw_path.replace("file://", "")
+                                    full_path = os.path.normpath(os.path.join(dir_name, rel_path))
                                     local_import_paths.append(full_path)
                     except Exception as e:
-                        # Gestione generica delle eccezioni, potrebbe essere utile aggiungere un log
                         continue
-
             return local_import_paths
 
 
