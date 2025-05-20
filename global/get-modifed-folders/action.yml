@@ -149,8 +149,8 @@ runs:
                         continue
 
                     # Salta le directory
-                    if os.path.isdir(file_path):
-                        continue
+                    #if os.path.isdir(file_path):
+                    #    continue
 
                     # Salta i file binari
                     if is_binary_file(file_path):
