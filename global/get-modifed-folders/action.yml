@@ -153,8 +153,8 @@ runs:
                     #    continue
 
                     # Salta i file binari
-                    if is_binary_file(file_path):
-                        continue
+                    #if is_binary_file(file_path):
+                    #    continue
 
                     print(f"🐷 Anal filepath: {file_name}")
                     try:
