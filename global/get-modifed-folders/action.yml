@@ -157,9 +157,9 @@ runs:
                                 # Regex per trovare percorsi di importazione locali
                                 local_import_pattern = r'source\s*=\s*["\'](?!https?://)([^"\']+)["\']'
                                 match = re.search(local_import_pattern, line)
-                                print(f"0: {match.group(0)}")
-                                print(f"1: {match.group(1)}")
                                 if match:
+                                    print(f"0: {match.group(0)}")
+                                    print(f"1: {match.group(1)}")
                                     raw_path = match.group(1)
                                     rel_path = raw_path.replace("file://", "")
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
