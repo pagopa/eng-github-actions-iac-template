@@ -22,6 +22,9 @@ inputs:
   include_folders:
     description: '(Optional) Folders to include in the sparse checkout'
     default: "scripts,.utils"
+  scan_suffix:
+    description: '(Optional) File suffixes to scan for dependencies'
+    default: ".tf,.tfvars"
 
 
 outputs:
@@ -68,6 +71,7 @@ runs:
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
         STOPPER_FOLDERS = "${{ inputs.stopper_folders }}".split(",")
         INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
+        SCAN_SUFFIX = "${{ inputs.scan_suffix }}".split(",")
 
 
         def get_current_branch():
@@ -140,9 +144,7 @@ runs:
                     file_path = os.path.join(path, file_name)
                     print(f"🔍🚀 Searching dependencies on file: {file_path}")
 
-                    if pathlib.Path(file_name).suffix.lower() == ".md":
-                        continue
-                    if pathlib.Path(file_name).suffix.lower() == "":
+                    if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
                         continue
 
                     # Salta le directory
