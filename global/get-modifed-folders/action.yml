@@ -150,7 +150,7 @@ runs:
                         with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
                             for line in file_reader:
                                 # Regex per trovare percorsi di importazione locali
-                                local_import_pattern = r'source\s*=\s*["\'](\./|file://|\.\./|\.\./\.\./)([^"\']*)["\']'
+                                local_import_pattern = r'source\s*=\s*["\']((?:\.{1,2}/|file://)[^"\']*)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
                                     # Combina il riferimento locale (./ o file://) e il resto del percorso
