@@ -95,7 +95,7 @@ runs:
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
-          stopper_indexes = [parts.index(folder) for folder in STOPPER_FOLDER if folder in parts]
+          stopper_indexes = [parts.index(folder) for folder in STOPPER_FOLDERS if folder in parts]
           print(f"STOPPER: {stopper_indexes}")
           if stopper_indexes:
               first_stopper = min(stopper_indexes)
