@@ -66,7 +66,7 @@ runs:
         STARTING_INDEX = "${{ inputs.start_folder }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
-        STOPPER_FOLDER = "${{ inputs.stopper_folders }}".split(",")
+        STOPPER_FOLDERS = "${{ inputs.stopper_folders }}".split(",")
         INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
 
 
@@ -95,12 +95,13 @@ runs:
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
-          stopper_indexes = [parts.index(folder) for folder in STOPPER_FOLDERS if folder in parts]
-          print(f"STOPPER: {stopper_indexes}")
-          if stopper_indexes:
-              first_stopper = min(stopper_indexes)
-              return os.sep.join(parts[:first_stopper])
+          stopper_positions = [parts.index(folder) for folder in STOPPER_FOLDERS if folder in parts]
+          print(f"STOP: {stopper_positions}")
+          if stopper_positions:
+              cut_index = min(stopper_positions)
+              return os.sep.join(parts[:cut_index])
           return dirs
+
 
           ## Split the path into its components
           #parts = path.split(os.sep)
