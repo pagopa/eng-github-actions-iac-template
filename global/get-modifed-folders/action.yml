@@ -12,9 +12,19 @@ inputs:
   include_patterns:
     description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
+  stopper_folders:
+    description: '(Required) Pattern to stop at directory before the configured parameter. Example: "env" will stop at any folder named "env"'
+    required: true
+    default: "env"
   ignore_patterns:
     description: '(Optional) Whether to exclude ignored paths'
     default: ".github,.devops,.vscode"
+  include_folders:
+    description: '(Optional) Folders to include in the sparse checkout'
+    default: "scripts,.utils"
+  scan_suffix:
+    description: '(Optional) File suffixes to scan for dependencies'
+    default: ".tf,.tfvars"
 
 
 outputs:
@@ -52,12 +62,16 @@ runs:
         import subprocess
         from typing import List
         import re
+        import pathlib
 
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
         STARTING_INDEX = "${{ inputs.start_folder }}"
         DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
+        STOPPER_FOLDERS = "${{ inputs.stopper_folders }}".split(",")
+        INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
+        SCAN_SUFFIX = "${{ inputs.scan_suffix }}".split(",")
 
 
         def get_current_branch():
@@ -83,42 +97,30 @@ runs:
           return parts
 
         def get_required_path(path, patterns: List):
-          # Split the path into its components
-          parts = path.split(os.sep)
+          dirs = os.path.dirname(path)
+          parts = dirs.split(os.sep)
+          for idx, part in enumerate(parts):
+              if part in STOPPER_FOLDERS:
+                  idx = (1 if idx == 0 else idx) # must start from 1
+                  return os.sep.join(parts[:idx])
+          return dirs
 
-          try:
-            # Iterate over each pattern in the provided patterns list
-            if not any(pattern in parts for pattern in patterns):
-              if "/" in INCLUDE_PATTERNS:
-                return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
-              return ""
+        def find_all_dependencies(paths, accumulator=None, visited=None):
+            if accumulator is None:
+                accumulator = set()
+            if visited is None:
+                visited = set()
 
-            for pattern in patterns:
-              if not pattern in parts:
-                continue
-              # Find the index of the current pattern starting from the start_index
-              start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
-
-              # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
-              pattern_index = parts.index(pattern, start_index)
-              # Check if there are at least two more parts after the pattern_index
-              if len(parts) > pattern_index + 2:
-                # Use DEFAULT_END_INDEX as the end index for the slice
-                end_index = DEFAULT_END_INDEX
-
-                # Join the relevant parts of the path and return the result
-                return os.sep.join(file_check(parts)[pattern_index:end_index])
-              else:
-                # If the path is too short, return an empty string
-                return os.sep.join(file_check(parts)[pattern_index:])
-          except (ValueError, IndexError) as e:
-            # If any error occurs (like value not found or index error), return an empty string
-            print(e)
-            return ""
+            direct_deps = inspect_for_source_dependence(paths)
+            for dep in direct_deps:
+                if dep not in visited:
+                    accumulator.add(dep)
+                    visited.add(dep)
+                    find_all_dependencies([dep], accumulator, visited)
+            return accumulator
 
         def inspect_for_source_dependence(paths):
             local_import_paths = []
-
             def is_binary_file(file_path):
                 """Controlla se un file è binario analizzando i primi byte."""
                 try:
@@ -126,7 +128,10 @@ runs:
                         # Legge i primi 1024 byte del file
                         chunk = f.read(1024)
                         # Cerca caratteri nulli o altri caratteri non-ASCII
-                        return b'\0' in chunk or len(chunk.decode('utf-8', errors='ignore')) != len(chunk)
+                        if b'\0' in chunk or len(chunk.decode('utf-8', errors='ignore')) != len(chunk):
+                            return True
+                        else:
+                            return False
                 except Exception:
                     # In caso di errore, considera il file come binario per sicurezza
                     return True
@@ -135,31 +140,33 @@ runs:
                 if not os.path.exists(path):
                     continue
 
+                # Skip directory
+                if not os.path.isdir(path):
+                  continue
+
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
+                    if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
+                      continue
 
-                    # Salta le directory
-                    if os.path.isdir(file_path):
-                        continue
-
-                    # Salta i file binari
+                    # Skip binari
                     if is_binary_file(file_path):
                         continue
 
                     try:
                         with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
+                            dir_name = os.path.dirname(file_path)
+                            local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                             for line in file_reader:
-                                # Regex per trovare percorsi di importazione locali
-                                local_import_pattern = r'source\s*=\s*["\'](\./|file://|\.\./)([^"\']*)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
-                                    # Combina il riferimento locale (./ o file://) e il resto del percorso
-                                    full_path = match.group(2)
-                                    local_import_paths.append(full_path)
+                                    raw_path = match.group(1)
+                                    rel_path = raw_path.replace("file://", "")
+                                    full_path = os.path.normpath(os.path.join(dir_name, rel_path))
+                                    if os.path.exists(full_path) and os.path.isdir(full_path):
+                                      local_import_paths.append(full_path)
                     except Exception as e:
-                        # Gestione generica delle eccezioni, potrebbe essere utile aggiungere un log
-                        continue
-
+                      print(f"⚠️ Warn on dependencies check: {e}")
             return local_import_paths
 
 
@@ -177,7 +184,7 @@ runs:
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
-            unique_paths.extend(inspect_for_source_dependence(unique_paths))
+            unique_paths.extend(find_all_dependencies(unique_paths))
 
             # Filtra per escludere i percorsi che iniziano con '../'
             filtered_paths = [path for path in unique_paths if not path.startswith('../')]
@@ -200,6 +207,9 @@ runs:
           # Combine the results of the two calls into a single list
           modified_paths = get_modified_paths(INCLUDE_PATTERNS)
           print(f"🔍 get_modified_paths\n{modified_paths}")
+
+          # Add included folders in modified paths
+          modified_paths.extend(INCLUDE_FOLDERS)
 
           # Join all modified paths into a single string separated by new lines
           modified_paths_str = "\n".join(modified_paths)
@@ -249,12 +259,6 @@ runs:
         # Read all paths and download only the modified folders
         MODIFIED_FOLDERS=($(cat /tmp/paths.txt))
         echo "📁 Current modified directory: ${MODIFIED_FOLDERS[@]}"
-
-        # Include 'scripts' in the list of directories to checkout
-        MODIFIED_FOLDERS+=("scripts" ".utils")
-
-        # Include 'utils' in the list of directories to checkout
-        MODIFIED_FOLDERS+=(".utils")
 
         # Initialize git sparse-checkout
         git sparse-checkout init --cone

@@ -22,7 +22,24 @@ The workflow:
   ```yaml
   ".github,.devops,.vscode,.utils"
   ```
+- ìnclude_folders` (Optional): Folders to include in path filtering. Default: `'scripts,.utils'` Example:
+  ```yaml
+  ".scripts,.utils"
+  ```
+- stopper_folders:` (Required) Pattern to stop at directory before the configured parameter. Example:` "env" will stop at any folder named "env"'
+  ```yaml
+    default: "env"
+  ```
+- include_folders:`(Optional) Folders to include in the sparse checkout`
+  ```yaml
+    default: "scripts,.utils"
+  ```
   
+- scan_suffix: `(Optional) File suffixes to scan for dependencies`
+  ```yaml
+   default: ".tf,.tfvars"
+  ```
+
 ## Outputs
 
 - `modified_paths`: List of modified paths obtained.
@@ -35,9 +52,11 @@ The workflow:
         id: get-paths
         uses: pagopa/eng-github-actions-iac-template/global/get-modifed-folders@main
         with:
+          ignore_patterns: ".github,.devops,.vscode,.terraform-version"
           start_folder: "src"
-          default_end_folder_depth: 3
+          default_end_folder_depth: 2
           include_patterns: "src,domains"
+          stopper_folders: "env,tests,api,api_product,helm"
 ```
 
 ## Notes
