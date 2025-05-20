@@ -148,6 +148,7 @@ runs:
 
                     try:
                         with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
+                            dir_name = os.path.dirname(file_path)
                             for line in file_reader:
                                 # Regex per trovare percorsi di importazione locali
                                 local_import_pattern = r'source\s*=\s*["\']((?:\.{1,2}/|file://)[^"\']*)["\']'
@@ -158,7 +159,7 @@ runs:
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
                                     local_import_paths.append(full_path)
                     except Exception as e:
-                        continue
+                      print(f"⚠️ Warn on dependencies check: {e}")
             return local_import_paths
 
 
