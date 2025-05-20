@@ -13,7 +13,6 @@ The workflow:
 ## Inputs
 
 - `start_folder` (Optional): Starting index for path filtering. Default: `'/'`.
-- `default_end_folder_depth` (Optional): Default end index for path slicing. Default: `2`.
 - `include_patterns` (Required): Patterns to include in path filtering. Example:
   ```yaml
   "src,domains"
@@ -26,10 +25,12 @@ The workflow:
   ```yaml
   ".scripts,.utils"
   ```
+  
 - stopper_folders:` (Required) Pattern to stop at directory before the configured parameter. Example:` "env" will stop at any folder named "env"'
   ```yaml
     default: "env"
   ```
+  
 - include_folders:`(Optional) Folders to include in the sparse checkout`
   ```yaml
     default: "scripts,.utils"
@@ -54,7 +55,6 @@ The workflow:
         with:
           ignore_patterns: ".github,.devops,.vscode,.terraform-version"
           start_folder: "src"
-          default_end_folder_depth: 2
           include_patterns: "src,domains"
           stopper_folders: "env,tests,api,api_product,helm"
 ```
