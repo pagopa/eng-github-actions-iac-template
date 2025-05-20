@@ -143,6 +143,7 @@ runs:
 
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
+                    print(f"🔍🚀 Anal filepath: {file_path}")
 
                     if pathlib.Path(file_name).suffix.lower() == ".md":
                         continue
@@ -156,10 +157,12 @@ runs:
                         continue
 
                     try:
+                        print(f"🐷 Anal filepath: {file_path}")
                         with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
                             dir_name = os.path.dirname(file_path)
                             local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                             for line in file_reader:
+                                print(f"DUBUGG: {line}")
                                 match = re.search(local_import_pattern, line)
                                 if match:
                                     print(f"0: {match.group(0)}")
