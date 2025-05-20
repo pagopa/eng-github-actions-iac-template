@@ -158,7 +158,7 @@ runs:
 
                     print(f"🐷 Anal filepath: {file_name}")
                     try:
-                        with open(file_name, 'r', encoding='utf-8') as file_reader:
+                        with open(file_path, 'r', encoding='utf-8') as file_reader:
                             dir_name = os.path.dirname(file_path)
                             local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                             for line in file_reader:
