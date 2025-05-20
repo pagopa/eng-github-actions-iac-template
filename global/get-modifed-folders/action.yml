@@ -155,7 +155,7 @@ runs:
                             dir_name = os.path.dirname(file_path)
                             for line in file_reader:
                                 # Regex per trovare percorsi di importazione locali
-                                local_import_pattern = r'source\s*=\s*["\']((?:\.{1,2}/|file://)[^"\']*)["\']'
+                                local_import_pattern = r'source\s*=\s*["\'](\./|file://|\.\./)([^"\']*)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
                                     raw_path = match.group(1)
