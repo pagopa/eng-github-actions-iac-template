@@ -101,6 +101,20 @@ runs:
                   return os.sep.join(parts[:idx])
           return dirs
 
+        def find_all_dependencies(paths, accumulator=None, visited=None):
+            if accumulator is None:
+                accumulator = set()
+            if visited is None:
+                visited = set()
+
+            direct_deps = inspect_for_source_dependence(paths)
+            for dep in direct_deps:
+                if dep not in visited:
+                    accumulator.add(dep)
+                    visited.add(dep)
+                    find_all_dependencies([dep], accumulator, visited)
+            return accumulator
+
         def inspect_for_source_dependence(paths):
             local_import_paths = []
             def is_binary_file(file_path):
@@ -127,6 +141,8 @@ runs:
                     print(f"🔍🚀 Searching dependencies on file: {file_path}")
 
                     if pathlib.Path(file_name).suffix.lower() == ".md":
+                        continue
+                    if pathlib.Path(file_name).suffix.lower() == "":
                         continue
 
                     # Salta le directory
@@ -169,7 +185,7 @@ runs:
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
-            unique_paths.extend(inspect_for_source_dependence(unique_paths))
+            unique_paths.extend(find_all_dependencies(unique_paths))
 
             # Filtra per escludere i percorsi che iniziano con '../'
             filtered_paths = [path for path in unique_paths if not path.startswith('../')]
