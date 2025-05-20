@@ -141,7 +141,7 @@ runs:
                     continue
 
                 # Skip directory
-                if os.path.isdir(path):
+                if not os.path.isdir(path):
                   continue
 
                 for file_name in os.listdir(path):
