@@ -139,7 +139,6 @@ runs:
                     return True
 
             for path in paths:
-                print(f"il PATH: {path}")
                 if not os.path.exists(path):
                     continue
 
@@ -159,7 +158,7 @@ runs:
                         continue
 
                     try:
-                        with open(file_path, 'r', encoding='utf-8') as file_reader:
+                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
                             dir_name = os.path.dirname(file_path)
                             local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                             for line in file_reader:
