@@ -140,6 +140,10 @@ runs:
                 if not os.path.exists(path):
                     continue
 
+                # Skip directory
+                if os.path.isdir(path):
+                  continue
+
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
                     print(f"🔍🚀 Searching dependencies on file: {file_path}")
@@ -147,11 +151,7 @@ runs:
                     if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
                       continue
 
-                    # Salta le directory
-                    if os.path.isdir(file_path):
-                        continue
-
-                    # Salta i file binari
+                    # Skip binari
                     if is_binary_file(file_path):
                         continue
 
