@@ -156,8 +156,8 @@ runs:
                     if is_binary_file(file_path):
                         continue
 
+                    print(f"🐷 Anal filepath: {file_name}")
                     try:
-                        print(f"🐷 Anal filepath: {file_name}")
                         with open(file_name, 'r', encoding='utf-8') as file_reader:
                             dir_name = os.path.dirname(file_path)
                             local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
