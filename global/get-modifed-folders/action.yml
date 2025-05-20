@@ -6,9 +6,6 @@ inputs:
   start_folder:
     description: '(Optional) Starting index for path filtering'
     default: '/'
-  default_end_folder_depth:
-    description: '(Optional) Default end index for path slicing'
-    default: 2
   include_patterns:
     description: '(Required) Patterns to include in path filtering, comma separated'
     required: true
@@ -67,7 +64,6 @@ runs:
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
         STARTING_INDEX = "${{ inputs.start_folder }}"
-        DEFAULT_END_INDEX = ${{ inputs.default_end_folder_depth }}
         INCLUDE_PATTERNS = "${{ inputs.include_patterns }}".split(",")
         STOPPER_FOLDERS = "${{ inputs.stopper_folders }}".split(",")
         INCLUDE_FOLDERS = "${{ inputs.include_folders }}".split(",")
