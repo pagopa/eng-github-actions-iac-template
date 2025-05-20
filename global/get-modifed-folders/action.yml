@@ -158,7 +158,7 @@ runs:
                                 local_import_pattern = r'source\s*=\s*["\'](?!https?://)([^"\']+)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
-                                    raw_path = match.group(1)
+                                    raw_path = match.group(2)
                                     rel_path = raw_path.replace("file://", "")
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
                                     print(f"💬 {full_path}")
