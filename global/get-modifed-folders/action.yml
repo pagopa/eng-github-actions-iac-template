@@ -97,6 +97,7 @@ runs:
           parts = dirs.split(os.sep)
           for idx, part in enumerate(parts):
               if part in STOPPER_FOLDERS:
+                  print(f"DEBUG: {os.sep.join(parts[:idx])}")
                   return os.sep.join(parts[:idx])
           return dirs
 
