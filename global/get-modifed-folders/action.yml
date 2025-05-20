@@ -252,9 +252,6 @@ runs:
         # Include 'scripts' in the list of directories to checkout
         MODIFIED_FOLDERS+=("scripts" ".utils")
 
-        # Include 'utils' in the list of directories to checkout
-        MODIFIED_FOLDERS+=(".utils")
-
         # Initialize git sparse-checkout
         git sparse-checkout init --cone
 
