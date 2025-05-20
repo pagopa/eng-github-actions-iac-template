@@ -144,7 +144,7 @@ runs:
                     file_path = os.path.join(path, file_name)
                     print(f"🔍🚀 Searching dependencies on file: {file_path}")
 
-                    if any(pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX):
+                    if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
                       continue
 
                     # Salta le directory
