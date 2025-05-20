@@ -155,7 +155,7 @@ runs:
                             dir_name = os.path.dirname(file_path)
                             for line in file_reader:
                                 # Regex per trovare percorsi di importazione locali
-                                local_import_pattern = r'source\s*=\s*["\'](?!https?://)([^"\']+)["\']'
+                                local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                                 match = re.search(local_import_pattern, line)
                                 if match:
                                     print(f"0: {match.group(0)}")
