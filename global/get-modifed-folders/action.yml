@@ -95,11 +95,11 @@ runs:
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
-          if "env" in parts:
-            index_env = parts.index("env")
-            return os.sep.join(parts[:index_env])
-          else:
-            return dirs
+          stopper_indexes = [parts.index(folder) for folder in stopper_folders if folder in parts]
+          if stopper_indexes:
+              first_stopper = min(stopper_indexes)
+              return os.sep.join(parts[:first_stopper])
+          return dirs
 
           ## Split the path into its components
           #parts = path.split(os.sep)
