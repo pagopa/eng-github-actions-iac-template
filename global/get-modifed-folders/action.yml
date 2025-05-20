@@ -161,6 +161,7 @@ runs:
                                     raw_path = match.group(1)
                                     rel_path = raw_path.replace("file://", "")
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
+                                    print(f"💬 {full_path}")
                                     local_import_paths.append(full_path)
                     except Exception as e:
                       print(f"⚠️ Warn on dependencies check: {e}")
