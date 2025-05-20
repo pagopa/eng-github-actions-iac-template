@@ -101,40 +101,6 @@ runs:
                   return os.sep.join(parts[:idx])
           return dirs
 
-
-          ## Split the path into its components
-          #parts = path.split(os.sep)
-
-          #try:
-          #  # Iterate over each pattern in the provided patterns list
-          #  if not any(pattern in parts for pattern in patterns):
-          #    if "/" in INCLUDE_PATTERNS:
-          #      return os.sep.join(file_check(parts)[0:DEFAULT_END_INDEX])
-          #    return ""
-
-          #  for pattern in patterns:
-          #    if not pattern in parts:
-          #      continue
-          #    # Find the index of the current pattern starting from the start_index
-          #    start_index = parts.index(STARTING_INDEX) if STARTING_INDEX != "/" else 0
-
-          #    # Find the index of "src" (or any other starting point defined by STARTING_INDEX)
-          #    pattern_index = parts.index(pattern, start_index)
-          #    # Check if there are at least two more parts after the pattern_index
-          #    if len(parts) > pattern_index + 2:
-          #      # Use DEFAULT_END_INDEX as the end index for the slice
-          #      end_index = DEFAULT_END_INDEX
-
-          #      # Join the relevant parts of the path and return the result
-          #      return os.sep.join(file_check(parts)[pattern_index:end_index])
-          #    else:
-          #      # If the path is too short, return an empty string
-          #      return os.sep.join(file_check(parts)[pattern_index:])
-          #except (ValueError, IndexError) as e:
-          #  # If any error occurs (like value not found or index error), return an empty string
-          #  print(e)
-          #  return ""
-
         def inspect_for_source_dependence(paths):
             local_import_paths = []
             def is_binary_file(file_path):
