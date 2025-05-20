@@ -95,11 +95,9 @@ runs:
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
-          stopper_positions = [parts.index(folder) for folder in STOPPER_FOLDERS if folder in parts]
-          print(f"STOP: {stopper_positions}")
-          if stopper_positions:
-              cut_index = min(stopper_positions)
-              return os.sep.join(parts[:cut_index])
+          for idx, part in enumerate(parts):
+              if part in STOPPER_FOLDERS:
+                  return os.sep.join(parts[:idx])
           return dirs
 
 
