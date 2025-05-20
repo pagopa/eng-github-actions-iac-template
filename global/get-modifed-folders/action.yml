@@ -55,6 +55,7 @@ runs:
         import subprocess
         from typing import List
         import re
+        import pathlib
 
         DEFAULT_IGNORED_PATHS = "${{ inputs.ignore_patterns }}".split(",")
 
@@ -142,6 +143,9 @@ runs:
 
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
+
+                    if pathlib.Path(file_name.suffix).lower() == ".md":
+                        continue
 
                     # Salta le directory
                     if os.path.isdir(file_path):
