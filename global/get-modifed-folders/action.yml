@@ -95,6 +95,7 @@ runs:
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
+          print(f"parts: {parts}")
           for idx, part in enumerate(parts):
               if part in STOPPER_FOLDERS:
                   print(f"DEBUG: {os.sep.join(parts[:idx])}")
