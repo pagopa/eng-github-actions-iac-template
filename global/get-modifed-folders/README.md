@@ -22,6 +22,10 @@ The workflow:
   ```yaml
   ".github,.devops,.vscode,.utils"
   ```
+- ìnclude_folders` (Optional): Folders to include in path filtering. Default: `'scripts,.utils'` Example:
+  ```yaml
+  ".scripts,.utils"
+  ```
   
 ## Outputs
 
