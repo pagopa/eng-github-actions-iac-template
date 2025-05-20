@@ -131,7 +131,10 @@ runs:
                         # Legge i primi 1024 byte del file
                         chunk = f.read(1024)
                         # Cerca caratteri nulli o altri caratteri non-ASCII
-                        return b'\0' in chunk or len(chunk.decode('utf-8', errors='ignore')) != len(chunk)
+                        if b'\0' in chunk or len(chunk.decode('utf-8', errors='ignore')) != len(chunk):
+                            return True
+                        else:
+                            return False
                 except Exception:
                     # In caso di errore, considera il file come binario per sicurezza
                     return True
@@ -149,12 +152,12 @@ runs:
                         continue
 
                     # Salta le directory
-                    #if os.path.isdir(file_path):
-                    #    continue
+                    if os.path.isdir(file_path):
+                        continue
 
                     # Salta i file binari
-                    #if is_binary_file(file_path):
-                    #    continue
+                    if is_binary_file(file_path):
+                        continue
 
                     print(f"🐷 Anal filepath: {file_name}")
                     try:
