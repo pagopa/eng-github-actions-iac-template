@@ -96,6 +96,7 @@ runs:
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
           stopper_indexes = [parts.index(folder) for folder in STOPPER_FOLDER if folder in parts]
+          print(f"STOPPER: {stopper_indexes}")
           if stopper_indexes:
               first_stopper = min(stopper_indexes)
               return os.sep.join(parts[:first_stopper])
