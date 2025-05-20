@@ -136,6 +136,7 @@ runs:
                     return True
 
             for path in paths:
+                print(f"il PATH: {path}")
                 if not os.path.exists(path):
                     continue
 
