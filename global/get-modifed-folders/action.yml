@@ -157,7 +157,7 @@ runs:
                 #  continue
 
                 for file in list_files_recursive(path):
-                    print(f"️[2]  dependencies check: {file}")
+                    print(f"️[1]  dependencies check: {file}")
                     if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX or not os.path.isdir(file):
                       continue
 
@@ -173,9 +173,13 @@ runs:
                             for line in file_reader:
                                 match = re.search(local_import_pattern, line)
                                 if match:
+                                    print(f"️[✅]  dependencies found!: {file}")
+
                                     raw_path = match.group(1)
                                     rel_path = raw_path.replace("file://", "")
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
+                                    print(f"️[ℹ️]  dependencies check: {full_path}")
+
                                     if os.path.exists(full_path) and os.path.isdir(full_path):
                                       local_import_paths.append(full_path)
                     except Exception as e:
