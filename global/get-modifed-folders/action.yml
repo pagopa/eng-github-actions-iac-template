@@ -175,16 +175,19 @@ runs:
                 if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
             ]
 
-            # 1° step: Removing duplicates and sorting
-            unique_paths = sorted(set([
+            dependencies = sorted(set([
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
-            unique_paths.extend(find_all_dependencies(unique_paths))
-
-            # 2° step: remove duplicates and check sub hidden dependencies
-            unique_paths.extend(find_all_dependencies(unique_paths))
-            unique_paths = sorted(set(unique_paths))
+            while True:
+                prev_len = len(dependencies)
+                # Find all new dependencies based on current list
+                extra_deps = find_all_dependencies(dependencies)
+                # Merge and deduplicate
+                dependencies = sorted(set(list(dependencies) + list(extra_deps)))
+                # Stop if the list didn't grow
+                if len(dependencies) == prev_len:
+                    break
 
             # Filtra per escludere i percorsi che iniziano con '../'
             filtered_paths = [path for path in unique_paths if not path.startswith('../')]
