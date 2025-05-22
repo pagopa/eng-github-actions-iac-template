@@ -138,10 +138,10 @@ runs:
                     continue
 
                 # Skip directory
-                if os.path.isdir(path):
-                  local_import_paths.append(path)
+                if not os.path.isdir(path):
                   continue
 
+                local_import_paths.append(path)
                 for file_name in os.listdir(path):
                     file_path = os.path.join(path, file_name)
                     if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
