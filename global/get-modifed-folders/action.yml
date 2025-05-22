@@ -151,10 +151,6 @@ runs:
                 if not os.path.exists(path):
                     continue
 
-                # Skip directory
-                #if not os.path.isdir(path):
-                #  continue
-
                 for file in list_files_recursive(path):
                     if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX:
                       continue
