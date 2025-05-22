@@ -190,7 +190,7 @@ runs:
                     break
 
             # Filtra per escludere i percorsi che iniziano con '../'
-            filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+            filtered_paths = [path for path in dependencies if not path.startswith('../')]
 
             return filtered_paths
 
