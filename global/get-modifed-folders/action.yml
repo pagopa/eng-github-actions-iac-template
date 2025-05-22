@@ -138,7 +138,8 @@ runs:
                     continue
 
                 # Skip directory
-                if not os.path.isdir(path):
+                if os.path.isdir(path):
+                   local_import_paths.append(path)
                   continue
 
                 for file_name in os.listdir(path):
