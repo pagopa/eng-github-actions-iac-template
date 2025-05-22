@@ -177,13 +177,13 @@ runs:
 
             # Removing duplicates and sorting
             unique_paths = sorted(set([
-                inspect_for_source_dependence(get_required_path(path, patterns))
+                get_required_path(path, patterns)
                 for path in paths if path
             ]))
             unique_paths.extend(find_all_dependencies(unique_paths))
 
             # Filtra per escludere i percorsi che iniziano con '../'
-            filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+            #filtered_paths = [path for path in unique_paths if not path.startswith('../')]
 
             return filtered_paths
 
