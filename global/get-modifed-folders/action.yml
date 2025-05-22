@@ -177,7 +177,7 @@ runs:
 
             # Removing duplicates and sorting
             unique_paths = sorted(set([
-                find_all_dependencies(get_required_path(path, patterns))
+                inspect_for_source_dependence(get_required_path(path, patterns))
                 for path in paths if path
             ]))
             unique_paths.extend(find_all_dependencies(unique_paths))
