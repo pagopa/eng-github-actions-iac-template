@@ -92,6 +92,21 @@ runs:
             parts.pop()
           return parts
 
+        def list_files_recursive(path):
+          all_paths = []
+          if os.path.isfile(path):
+              all_paths.append(path)
+          elif os.path.isdir(path):
+              for root, dirs, files in os.walk(path):
+                  for dir_name in dirs:
+                      all_paths.append(os.path.join(root, dir_name))
+                  for file_name in files:
+                      all_paths.append(os.path.join(root, file_name))
+          else:
+              raise FileNotFoundError(f"Path not found: {path}")
+          return all_paths
+
+
         def get_required_path(path, patterns: List):
           dirs = os.path.dirname(path)
           parts = dirs.split(os.sep)
@@ -136,22 +151,17 @@ runs:
                 if not os.path.exists(path):
                     continue
 
-                # Skip directory
-                if not os.path.isdir(path):
-                  continue
-
-                for file_name in os.listdir(path):
-                    file_path = os.path.join(path, file_name)
-                    if pathlib.Path(file_name).suffix.lower() not in SCAN_SUFFIX:
+                for file in list_files_recursive(path):
+                    if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX:
                       continue
 
                     # Skip binari
-                    if is_binary_file(file_path):
+                    if is_binary_file(file):
                         continue
 
                     try:
-                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_reader:
-                            dir_name = os.path.dirname(file_path)
+                        with open(file, 'r', encoding='utf-8', errors='ignore') as file_reader:
+                            dir_name = os.path.dirname(file)
                             local_import_pattern = r'source\s*=\s*["\'](?!https?:\/\/)([^"\']+)["\']'
                             for line in file_reader:
                                 match = re.search(local_import_pattern, line)
@@ -174,16 +184,23 @@ runs:
                 for line in lines
                 if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
             ]
-
-            # Removing duplicates and sorting
-            unique_paths = sorted(set([
+            dependencies = sorted(set([
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
-            unique_paths.extend(find_all_dependencies(unique_paths))
+            while True:
+                prev_len = len(dependencies)
+                # Find all new dependencies based on current list
+                extra_deps = find_all_dependencies(dependencies)
+
+                # Merge and deduplicate
+                dependencies = sorted(set(list(dependencies) + list(extra_deps)))
+                # Stop if the list didn't grow
+                if len(dependencies) == prev_len:
+                    break
 
             # Filtra per escludere i percorsi che iniziano con '../'
-            filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+            filtered_paths = [path for path in dependencies if not path.startswith('../')]
 
             return filtered_paths
 
