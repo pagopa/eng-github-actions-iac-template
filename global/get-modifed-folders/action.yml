@@ -175,7 +175,7 @@ runs:
                 for line in lines
                 if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
             ]
-
+            print(f"[-] PATH REQUIRED: {get_required_path(path, patterns)}")
             dependencies = sorted(set([
                 get_required_path(path, patterns)
                 for path in paths if path
