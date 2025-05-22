@@ -109,12 +109,11 @@ runs:
 
             direct_deps = inspect_for_source_dependence(paths)
             for dep in direct_deps:
-                dep_abs = os.path.abspath(dep)
-                if dep_abs not in visited:
-                    print(f"[+] Scansione nuova dipendenza: {dep_abs}")
-                    accumulator.add(dep_abs)
-                    visited.add(dep_abs)
-                    find_all_dependencies([dep_abs], accumulator, visited)
+                if dep not in visited:
+                    print(f"[+] Scansione nuova dipendenza: {dep}")
+                    accumulator.add(dep)
+                    visited.add(dep)
+                    find_all_dependencies([dep], accumulator, visited)
             return accumulator
 
         def inspect_for_source_dependence(paths):
@@ -181,6 +180,7 @@ runs:
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
+            print(f"[+] Elenco dipendenze: {dependencies}")
             while True:
                 prev_len = len(dependencies)
                 # Find all new dependencies based on current list
