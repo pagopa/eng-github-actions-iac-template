@@ -139,7 +139,7 @@ runs:
 
                 # Skip directory
                 if os.path.isdir(path):
-                   local_import_paths.append(path)
+                  local_import_paths.append(path)
                   continue
 
                 for file_name in os.listdir(path):
