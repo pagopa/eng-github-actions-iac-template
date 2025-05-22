@@ -185,7 +185,7 @@ runs:
             # Filtra per escludere i percorsi che iniziano con '../'
             #filtered_paths = [path for path in unique_paths if not path.startswith('../')]
 
-            return filtered_paths
+            return unique_paths
 
 
         def write_to_file(content, filepath):
