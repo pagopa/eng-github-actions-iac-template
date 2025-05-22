@@ -158,7 +158,9 @@ runs:
 
                 for file in list_files_recursive(path):
                     print(f"️[1]  dependencies check: {file}")
-                    if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX or not os.path.isdir(file):
+                    print(f"️[🔍] check suffix: {pathlib.Path(file).suffix.lower()} -> {SCAN_SUFFIX}")
+
+                    if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX:
                       continue
 
                     # Skip binari
