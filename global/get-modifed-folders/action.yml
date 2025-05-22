@@ -157,13 +157,14 @@ runs:
                 #  continue
 
                 for file in list_files_recursive(path):
+                    print(f"️[2]  dependencies check: {file}")
                     if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX or not os.path.isdir(file):
-                      inspect_for_source_dependence(file)
-                      print(f"mmm found: {file}")
+                      continue
 
                     # Skip binari
                     if is_binary_file(file):
                         continue
+                    print(f"️[2]  dependencies check: {file}")
 
                     try:
                         with open(file, 'r', encoding='utf-8', errors='ignore') as file_reader:
