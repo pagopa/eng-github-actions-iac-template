@@ -125,7 +125,6 @@ runs:
             direct_deps = inspect_for_source_dependence(paths)
             for dep in direct_deps:
                 if dep not in visited:
-                    print(f"[+] Scansione nuova dipendenza: {dep}")
                     accumulator.add(dep)
                     visited.add(dep)
                     find_all_dependencies([dep], accumulator, visited)
@@ -157,16 +156,12 @@ runs:
                 #  continue
 
                 for file in list_files_recursive(path):
-                    print(f"️[1]  dependencies check: {file}")
-                    print(f"️[🔍] check suffix: {pathlib.Path(file).suffix.lower()} -> {SCAN_SUFFIX}")
-
                     if pathlib.Path(file).suffix.lower() not in SCAN_SUFFIX:
                       continue
 
                     # Skip binari
                     if is_binary_file(file):
                         continue
-                    print(f"️[2]  dependencies check: {file}")
 
                     try:
                         with open(file, 'r', encoding='utf-8', errors='ignore') as file_reader:
@@ -175,13 +170,9 @@ runs:
                             for line in file_reader:
                                 match = re.search(local_import_pattern, line)
                                 if match:
-                                    print(f"️[✅]  dependencies found!: {file}")
-
                                     raw_path = match.group(1)
                                     rel_path = raw_path.replace("file://", "")
                                     full_path = os.path.normpath(os.path.join(dir_name, rel_path))
-                                    print(f"️[ℹ️]  dependencies check: {full_path}")
-
                                     if os.path.exists(full_path) and os.path.isdir(full_path):
                                       local_import_paths.append(full_path)
                     except Exception as e:
@@ -197,17 +188,14 @@ runs:
                 for line in lines
                 if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
             ]
-            print(f"[-] PATH REQUIRED: {paths},{patterns}")
             dependencies = sorted(set([
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
-            print(f"[+] Elenco dipendenze: {dependencies}")
             while True:
                 prev_len = len(dependencies)
                 # Find all new dependencies based on current list
                 extra_deps = find_all_dependencies(dependencies)
-                print(f"[+] Elenco extra dipendenze: {extra_deps}")
 
                 # Merge and deduplicate
                 dependencies = sorted(set(list(dependencies) + list(extra_deps)))
@@ -217,7 +205,6 @@ runs:
 
             # Filtra per escludere i percorsi che iniziano con '../'
             filtered_paths = [path for path in dependencies if not path.startswith('../')]
-            print("Tutte le dipendenze trovate:", filtered_paths)
 
             return filtered_paths
 
