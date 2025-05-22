@@ -103,7 +103,7 @@ runs:
                   for file_name in files:
                       all_paths.append(os.path.join(root, file_name))
           else:
-              raise FileNotFoundError(f"Percorso non trovato: {path}")
+              raise FileNotFoundError(f"Path not found: {path}")
           return all_paths
 
 
