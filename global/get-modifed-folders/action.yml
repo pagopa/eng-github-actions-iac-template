@@ -191,6 +191,7 @@ runs:
 
             # Filtra per escludere i percorsi che iniziano con '../'
             filtered_paths = [path for path in dependencies if not path.startswith('../')]
+            print("Tutte le dipendenze trovate:", filtered_paths)
 
             return filtered_paths
 
