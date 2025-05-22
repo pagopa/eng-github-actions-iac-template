@@ -175,17 +175,21 @@ runs:
                 if not any(ignored in line for ignored in DEFAULT_IGNORED_PATHS)
             ]
 
-            # Removing duplicates and sorting
+            # 1° step: Removing duplicates and sorting
             unique_paths = sorted(set([
                 get_required_path(path, patterns)
                 for path in paths if path
             ]))
             unique_paths.extend(find_all_dependencies(unique_paths))
 
-            # Filtra per escludere i percorsi che iniziano con '../'
-            #filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+            # 2° step: remove duplicates and check sub hidden dependencies
+            unique_paths = sorted(set(unique_paths))
+            unique_paths.extend(find_all_dependencies(unique_paths))
 
-            return unique_paths
+            # Filtra per escludere i percorsi che iniziano con '../'
+            filtered_paths = [path for path in unique_paths if not path.startswith('../')]
+
+            return filtered_paths
 
 
         def write_to_file(content, filepath):
