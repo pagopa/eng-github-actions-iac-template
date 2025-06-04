@@ -1,5 +1,5 @@
-name: "Run terraform plan"
-description: "Run terraform plan on AWS"
+name: "Run terraform apply"
+description: "Run terraform apply on AWS"
 
 inputs:
   aws_iam_role:
@@ -26,20 +26,13 @@ runs:
         role-to-assume: ${{ inputs.aws_iam_role }}
         aws-region: ${{ inputs.aws_region }}
 
-    - name: Cache terraform modules
-      id: cache-terraform-modules
-      uses: actions/cache@6fd2d4538ca777f67fccddb233cf1a8ff1339012
-      with:
-        path: ${{ inputs.dir }}/.terraform
-        key: terraform-${{ inputs.dir }}-${{ github.sha }}
-        restore-keys: |
-          terraform-${{ inputs.dir }}
-
-    - name: Terraform plan
+    - name: Terraform apply
       shell: bash
       run: |
         export PATH="${HOME}/bin:$PATH"
 
         cd ${{ inputs.dir }}
 
-        bash terraform.sh plan ${{ inputs.aws_environment }} -lock-timeout=300s -lock=false
+        terraform apply -lock-timeout=3000s -auto-approve -input=false tfplan-${{ inputs.aws_environment }}-${{ github.sha }}
+
+        rm -rf tfplan-${{ inputs.aws_environment }}-${{ github.sha }}

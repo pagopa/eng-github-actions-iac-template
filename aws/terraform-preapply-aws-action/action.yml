@@ -1,5 +1,5 @@
-name: "Run terraform plan"
-description: "Run terraform plan on AWS"
+name: "Run terraform pre apply"
+description: "Run terraform pre apply on AWS"
 
 inputs:
   aws_iam_role:
@@ -26,6 +26,7 @@ runs:
         role-to-assume: ${{ inputs.aws_iam_role }}
         aws-region: ${{ inputs.aws_region }}
 
+
     - name: Cache terraform modules
       id: cache-terraform-modules
       uses: actions/cache@6fd2d4538ca777f67fccddb233cf1a8ff1339012
@@ -42,4 +43,4 @@ runs:
 
         cd ${{ inputs.dir }}
 
-        bash terraform.sh plan ${{ inputs.aws_environment }} -lock-timeout=300s -lock=false
+        bash terraform.sh plan ${{ inputs.aws_environment }} -lock-timeout=3000s -out=tfplan-${{ inputs.aws_environment }}-${{ github.sha }} -input=false
