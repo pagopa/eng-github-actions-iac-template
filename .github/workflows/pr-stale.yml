@@ -13,6 +13,3 @@ jobs:
         uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@fix-stale-pr-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          days-before-stale: '1'
-          days-before-close: '0'  # 0 closes immediately after marking as stale
-
