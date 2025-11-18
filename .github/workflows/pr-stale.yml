@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Mark stale PRs
-        uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@TCE-602-github-creazione-workflow-chiusura-pr-centralizzato
+        uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@fix-stale-pr-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: '1'
