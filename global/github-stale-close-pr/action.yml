@@ -23,6 +23,11 @@ inputs:
     required: false
     default: 'stale'
 
+  close-pr-label:
+    description: 'Label to apply when a PR is automatically closed'
+    required: false
+    default: 'auto-close'
+
   exempt-pr-labels:
     description: 'Comma-separated list of labels that exempt a PR from being marked as stale'
     required: false
@@ -88,6 +93,7 @@ runs:
 
         # Labels
         stale-pr-label: ${{ inputs.stale-pr-label }}
+        close-pr-label: ${{ inputs.close-pr-label }}
         exempt-pr-labels: ${{ inputs.exempt-pr-labels }}
 
         # Exemptions
@@ -102,6 +108,7 @@ runs:
         remove-stale-when-updated: ${{ inputs.remove-stale-when-updated }}
         operations-per-run: ${{ inputs.operations-per-run }}
         ascending: ${{ inputs.ascending }}
+        delete-branch: true
 
         # Only process PRs, not issues
         only-pr-labels: ''
