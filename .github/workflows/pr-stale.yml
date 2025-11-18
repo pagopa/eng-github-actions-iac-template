@@ -1,0 +1,17 @@
+name: PR Stale Management
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark stale PRs
+        uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@TCE-602-github-creazione-workflow-chiusura-pr-centralizzato
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: '1'
+          days-before-close: '-1'  # -1 disables auto-closing
