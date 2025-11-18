@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close stale PRs
-        uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+        uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
 ```
 
 ### Advanced Usage with Custom Configuration
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Close stale PRs
-        uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+        uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: 30
@@ -69,6 +69,7 @@ jobs:
 | `days-before-stale` | Number of days of inactivity before a PR is marked as stale | No | `25` |
 | `days-before-close` | Number of days of inactivity before a stale PR is closed | No | `5` |
 | `stale-pr-label` | Label to apply to stale PRs | No | `stale` |
+| `close-pr-label` | Label to apply when a PR is automatically closed | No | `auto-close` |
 | `exempt-pr-labels` | Comma-separated list of labels that exempt a PR from being marked as stale | No | `''` |
 | `exempt-pr-assignees` | Comma-separated list of assignees that exempt a PR from being marked as stale | No | `''` |
 | `exempt-draft-pr` | Exempt draft PRs from being marked as stale | No | `true` |
@@ -82,15 +83,16 @@ jobs:
 
 1. **Detection**: The action runs on a schedule (typically daily) and checks for PRs that have been inactive
 2. **Stale Marking**: After `days-before-stale` days of inactivity (default: 25 days), the PR is labeled with `stale-pr-label` and a warning comment is added
-3. **Auto-Close**: If the stale PR remains inactive for `days-before-close` additional days (default: 5 days), it is automatically closed with a closing message
-4. **Reactivation**: If activity occurs on a stale PR (new commit, comment, review), the stale label is automatically removed
+3. **Auto-Close**: If the stale PR remains inactive for `days-before-close` additional days (default: 5 days), it is automatically closed with a closing message and labeled with `close-pr-label`
+4. **Branch Deletion**: When a PR is closed automatically, its associated branch is deleted
+5. **Reactivation**: If activity occurs on a stale PR (new commit, comment, review), the stale label is automatically removed
 
 ## Examples
 
 ### Example 1: Conservative Settings (Longer Grace Period)
 
 ```yaml
-- uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+- uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
   with:
     days-before-stale: 45
     days-before-close: 15
@@ -100,17 +102,18 @@ jobs:
 ### Example 2: Aggressive Settings (Faster Cleanup)
 
 ```yaml
-- uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+- uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
   with:
     days-before-stale: 14
     days-before-close: 3
     stale-pr-label: 'auto-close-pending'
+    close-pr-label: 'closed-by-bot'
 ```
 
 ### Example 3: Only Label, Don't Close
 
 ```yaml
-- uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+- uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
   with:
     days-before-stale: 30
     days-before-close: -1  # Never close, only mark as stale
@@ -119,7 +122,7 @@ jobs:
 ### Example 4: Exempt Specific Labels
 
 ```yaml
-- uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
+- uses: pagopa/eng-github-actions-iac-template/global/github-stale-close-pr@main
   with:
     exempt-pr-labels: 'dependencies,keep-open,wip'
 ```
@@ -137,6 +140,8 @@ jobs:
 - Draft PRs are excluded by default to allow work-in-progress contributions
 - The action only processes PRs, not issues
 - Stale labels are automatically removed when PRs receive new activity
+- When a PR is closed automatically, the associated branch is deleted
+- Closed PRs are labeled with `close-pr-label` (default: `auto-close`) for easy identification
 - The action uses GitHub's official `actions/stale@v10` under the hood
 
 ## Troubleshooting
