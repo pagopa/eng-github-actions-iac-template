@@ -33,11 +33,6 @@ inputs:
     required: false
     default: ''
 
-  exempt-pr-authors:
-    description: 'Comma-separated list of PR authors that exempt a PR from being marked as stale'
-    required: false
-    default: ''
-
   exempt-draft-pr:
     description: 'Exempt draft PRs from being marked as stale'
     required: false
@@ -64,11 +59,6 @@ inputs:
 
       Thank you for your contribution! 🙏
 
-  stale-pr-label-only:
-    description: 'Only label PRs as stale, do not close them'
-    required: false
-    default: 'false'
-
   operations-per-run:
     description: 'Maximum number of operations per run (to avoid rate limits)'
     required: false
@@ -88,20 +78,20 @@ runs:
   using: 'composite'
   steps:
     - name: Mark stale PRs and close inactive ones
-      uses: actions/stale@v9
+      uses: actions/stale@v10
       with:
         repo-token: ${{ inputs.github-token }}
 
-        # Days configuration
-        days-before-stale: ${{ inputs.days-before-stale }}
-        days-before-close: ${{ inputs.days-before-close }}
+        # Days configuration - use PR-specific parameters
+        days-before-pr-stale: ${{ inputs.days-before-stale }}
+        days-before-pr-close: ${{ inputs.days-before-close }}
 
         # Labels
         stale-pr-label: ${{ inputs.stale-pr-label }}
         exempt-pr-labels: ${{ inputs.exempt-pr-labels }}
 
         # Exemptions
-        exempt-assignees: ${{ inputs.exempt-pr-assignees }}
+        exempt-pr-assignees: ${{ inputs.exempt-pr-assignees }}
         exempt-draft-pr: ${{ inputs.exempt-draft-pr }}
 
         # Messages

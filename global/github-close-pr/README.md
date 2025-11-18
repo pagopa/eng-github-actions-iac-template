@@ -71,11 +71,9 @@ jobs:
 | `stale-pr-label` | Label to apply to stale PRs | No | `stale` |
 | `exempt-pr-labels` | Comma-separated list of labels that exempt a PR from being marked as stale | No | `''` |
 | `exempt-pr-assignees` | Comma-separated list of assignees that exempt a PR from being marked as stale | No | `''` |
-| `exempt-pr-authors` | Comma-separated list of PR authors that exempt a PR from being marked as stale | No | `''` |
 | `exempt-draft-pr` | Exempt draft PRs from being marked as stale | No | `true` |
 | `stale-pr-message` | Message to post on PRs when they are marked as stale | No | See default message |
 | `close-pr-message` | Message to post on PRs when they are closed | No | See default message |
-| `stale-pr-label-only` | Only label PRs as stale, do not close them | No | `false` |
 | `operations-per-run` | Maximum number of operations per run (to avoid rate limits) | No | `30` |
 | `remove-stale-when-updated` | Remove stale label when a PR is updated | No | `true` |
 | `ascending` | Process PRs in ascending order (oldest first) | No | `false` |
@@ -115,16 +113,15 @@ jobs:
 - uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
   with:
     days-before-stale: 30
-    stale-pr-label-only: 'true'
+    days-before-close: -1  # Never close, only mark as stale
 ```
 
-### Example 4: Exempt Specific Users
+### Example 4: Exempt Specific Labels
 
 ```yaml
 - uses: pagopa/eng-github-actions-iac-template/global/github-close-pr@main
   with:
-    exempt-pr-authors: 'dependabot[bot],renovate[bot]'
-    exempt-pr-labels: 'dependencies'
+    exempt-pr-labels: 'dependencies,keep-open,wip'
 ```
 
 ## Best Practices
@@ -140,7 +137,7 @@ jobs:
 - Draft PRs are excluded by default to allow work-in-progress contributions
 - The action only processes PRs, not issues
 - Stale labels are automatically removed when PRs receive new activity
-- The action uses GitHub's official `actions/stale@v9` under the hood
+- The action uses GitHub's official `actions/stale@v10` under the hood
 
 ## Troubleshooting
 
@@ -158,7 +155,7 @@ jobs:
 ### Specific PRs should not be closed
 
 - Add exempt labels to those PRs
-- Add the PR authors to `exempt-pr-authors`
+- Add assignees to `exempt-pr-assignees`
 - Enable draft mode for WIP PRs
 
 ## License
