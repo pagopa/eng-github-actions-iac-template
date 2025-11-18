@@ -14,4 +14,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: '1'
-          days-before-close: '-1'  # -1 disables auto-closing
+          days-before-close: '0'  # 0 closes immediately after marking as stale
+
