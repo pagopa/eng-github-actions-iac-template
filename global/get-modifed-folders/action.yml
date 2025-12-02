@@ -274,7 +274,7 @@ runs:
         echo "📁 Current modified directory: ${MODIFIED_FOLDERS[@]}"
 
         # Initialize git sparse-checkout
-        git sparse-checkout init --cone
+        git sparse-checkout init --no-cone
 
         # Set each path in MODIFIED_FOLDERS for sparse-checkout
         git sparse-checkout set "${MODIFIED_FOLDERS[@]}"
