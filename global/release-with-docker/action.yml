@@ -15,7 +15,7 @@ runs:
   steps:
       - name: Release and tag action
         id: release
-        uses: pagopa/eng-github-actions-iac-template/global/release-action@main #
+        uses: pagopa/eng-github-actions-iac-template/global/release-action@3396a775736de09c06cf382ed914547943b33909 #1.25.0
         with:
           github_token: ${{ inputs.github_token }}
 
