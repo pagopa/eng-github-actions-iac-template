@@ -83,7 +83,7 @@ runs:
   using: 'composite'
   steps:
     - name: Mark stale PRs and close inactive ones
-      uses: actions/stale@v10
+      uses: actions/stale@1e223db275d687790206a7acac4d1a11bd6fe629 # v10
       with:
         repo-token: ${{ inputs.github-token }}
 
