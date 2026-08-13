@@ -12,6 +12,8 @@ runs:
   steps:
     - name: ⚡ Checkout code
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        submodules: recursive
 
     - name: 🏁 Init terraform folders
       id: init_terraform_folders
@@ -21,7 +23,7 @@ runs:
         echo    "+ 🏁 INIT TERRAFORM FOLDERS 🏁 +"
         echo -e "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n"
 
-        FOLDERS=$(grep -rl --include='*.tf' --exclude-dir='.terraform' '^' . | xargs -I{} dirname {} | sort -u)
+        FOLDERS=$(find . -type f -name '*.tf' -not -path '*/.terraform/*' -exec dirname {} \; | sort -u)
         echo "FOLDERS=${FOLDERS}"
 
         pids=()
@@ -32,24 +34,16 @@ runs:
         for f in $FOLDERS; do
           pushd "$(pwd)/${f}"
             echo "ℹ️Processing folder: ${f}"
-            sed -i -e 's/  backend "azurerm" {}//g' 99_main.tf # use local backend
+            if [ -f 99_main.tf ]; then
+              sed -i -e 's/  backend "azurerm" {}//g' 99_main.tf
+            fi
             docker run -v $root_folder:/tmp -w /tmp/${f} hashicorp/terraform:$TAG init &
             pids+=($!)
           popd
 
         done
 
-        # Wait for each specific process to terminate.
-        # Instead of this loop, a single call to 'wait' would wait for all the jobs
-        # to terminate, but it would not give us their exit status.
-        #
         for pid in "${pids[@]}"; do
-          #
-          # Waiting on a specific PID makes the wait command return with the exit
-          # status of that process. Because of the 'set -e' setting, any exit status
-          # other than zero causes the current shell to terminate with that exit
-          # status as well.
-          #
           wait "$pid"
         done
 
